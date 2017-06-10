@@ -1,0 +1,13 @@
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Isometric Client.CSharp.Tests.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Isometric Client.CSharp.Tests.pdb
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Assembly-CSharp.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Newtonsoft.Json.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Assembly-CSharp.pdb
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\Newtonsoft.Json.xml
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.xml
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\ru\Microsoft.VisualStudio.QualityTools.UnitTestFramework.resources.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.csprojResolveAssemblyReference.cache
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.dll
+E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.pdb
