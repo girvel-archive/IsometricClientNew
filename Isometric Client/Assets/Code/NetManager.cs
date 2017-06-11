@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using Assets.Code.Building;
 using Assets.Code.Common;
 using Assets.Code.Net;
+using Assets.Code.Ui;
 using Isometric.Core;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
+using Resources = UnityEngine.Resources;
 
 namespace Assets.Code
 {
@@ -24,56 +24,62 @@ namespace Assets.Code
 
         public void Run(string login, string password)
         {
-            using (_connection = new Connection(
+            _connection = new Connection(
                 new IPEndPoint(
-                    Dns.GetHostAddresses(Dns.GetHostName()).First(), 
-                    7999)))
-            {
-                _connection.Start();
+                    Dns.GetHostAddresses(Dns.GetHostName()).First(),
+                    7999));
+            _connection.Start();
 
-                _requestProcessor = new RequestProcessor(_connection);
+            _requestProcessor = new RequestProcessor(_connection);
 
-                _requestProcessor.Request(
-                    "login",
-                    new Dictionary<string, object>
-                    {
+            _requestProcessor.Request(
+                "login",
+                new Dictionary<string, object>
+                {
                         {"login", login},
                         {"password", password}
-                    },
-                    typeof (bool));
+                },
+                typeof(bool));
 
-                var area = (Area) _requestProcessor.Request(
-                    RequestType.GetArea, 
-                    new Dictionary<string, object>(), 
-                    typeof(Area))["area"];
+            BuildingsManager.Current.ShowArea(
+                (Area)_requestProcessor.Request(
+                    RequestType.GetArea,
+                    new Dictionary<string, object>(),
+                    typeof(Area))["area"]);
 
-                for (var x = 0; x < area.Buildings.GetLength(0); x++)
+            UiManager.Current.ShowResources(
+                (Isometric.Core.Resources)_requestProcessor.Request(
+                    "get resources",
+                    new Dictionary<string, object>(),
+                    typeof(Isometric.Core.Resources))["resources"]);
+
+            if ((bool)_requestProcessor.Request(
+                "upgrade",
+                new Dictionary<string, object>
                 {
-                    for (var y = 0; y < area.Buildings.GetLength(1); y++)
-                    {
-                        ((GameObject)Instantiate(Resources.Load<Object>("Plain")))
-                            .GetComponent<IsometricController>()
-                            .IsometricPosition = new Vector2(x, y);
-
-                        switch (area.Buildings[x, y].BuildingTemplate.Name)
-                        {
-                            case "Forest":
-                                ((GameObject)Instantiate(Resources.Load<Object>("Forest")))
-                                    .GetComponent<IsometricController>()
-                                    .IsometricPosition = new Vector2(x, y);
-                                break;
-
-                            case "House":
-                                ((GameObject)Instantiate(Resources.Load<Object>("House - wood underground")))
-                                    .GetComponent<IsometricController>()
-                                    .IsometricPosition = new Vector2(x, y);
-                                break;
-                        }
-                    }
-                }
+                        {"to", "House"},
+                        {"position", new Vector(0, 0)}
+                },
+                typeof(bool))["success"])
+            {
+                BuildingsManager.Current.SetBuilding(new Vector2(0, 0), "House");
             }
         }
-	
+
+        public bool TryUpgrade(string name, Vector position)
+        {
+            return (bool) _requestProcessor.Request(
+                "upgrade",
+                new Dictionary<string, object>
+                {
+                    {"to", name},
+                    {"position", position},
+                }, 
+                typeof(bool))["success"];
+        }
+
+
+
         private void FixedUpdate()
         {
         }

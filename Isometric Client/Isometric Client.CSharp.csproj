@@ -83,15 +83,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Code\Building\HolderController.cs" />
+    <Compile Include="Assets\Code\Building\BuildingImage.cs" />
+    <Compile Include="Assets\Code\Building\BuildingsManager.cs" />
     <Compile Include="Assets\Code\Building\IsometricController.cs" />
-    <Compile Include="Assets\Code\BuildingsManager.cs" />
     <Compile Include="Assets\Code\Common\SingletonBehaviour.cs" />
+    <Compile Include="Assets\Code\Common\VectorHelper.cs" />
+    <Compile Include="Assets\Code\Input\CameraController.cs" />
     <Compile Include="Assets\Code\Net\Connection.cs" />
+    <Compile Include="Assets\Code\Net\PermissionDeniedException.cs" />
     <Compile Include="Assets\Code\Net\RequestProcessor.cs" />
     <Compile Include="Assets\Code\Net\RequestType.cs" />
     <Compile Include="Assets\Code\NetManager.cs" />
     <Compile Include="Assets\Code\Ui\LoginButton.cs" />
     <Compile Include="Assets\Code\Ui\UiManager.cs" />
+    <Compile Include="Assets\Code\Ui\UpgradeButton.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

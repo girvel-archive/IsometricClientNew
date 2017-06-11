@@ -13,16 +13,20 @@ namespace Assets.Code.Building
         
         public static readonly Vector2 DefaultPlatformSize = new Vector2(0.56f, 0.26f);
 
-        protected void Start() {
+        protected void Start()
+        {
             LastPosition = transform.position;
         }
 
-        protected virtual void Update() {
+        protected virtual void Update()
+        {
             IsometricPositionRefresh();
         }
 
-        private void IsometricPositionRefresh() {
-            if (IsometricPosition != LastIsometricPosition) {
+        private void IsometricPositionRefresh()
+        {
+            if (IsometricPosition != LastIsometricPosition)
+            {
                 transform.position = new Vector2(
                     0.5f * DefaultPlatformSize.x * transform.localScale.x *
                         (IsometricPosition.y - IsometricPosition.x),
@@ -33,7 +37,8 @@ namespace Assets.Code.Building
 
                 LastIsometricPosition = IsometricPosition;
             }
-            else if ((Vector2)transform.position != LastPosition) {
+            else if ((Vector2)transform.position != LastPosition)
+            {
                 var roundx = Mathf.RoundToInt(transform.position.x /
                                      (0.5f * DefaultPlatformSize.x * transform.localScale.x));
 
