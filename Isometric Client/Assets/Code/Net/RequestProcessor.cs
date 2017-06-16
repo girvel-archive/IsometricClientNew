@@ -18,10 +18,8 @@ namespace Assets.Code.Net
 
 
 
-        public Dictionary<string, object> Request(string type, Dictionary<string, object> args, params Type[] argsTypes)
+        public Dictionary<string, object> Request(string type, Dictionary<string, object> args)
         {
-            var result = new Dictionary<string, object>();
-
             var serializer = JsonSerializer.Create(new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects});
 
             var response = JToken.Parse(
@@ -31,7 +29,7 @@ namespace Assets.Code.Net
                         {"type", type},
                         {"args", JToken.FromObject(args, serializer)}
                     }.ToString()))
-                .ToObject<Dictionary<string, object>>();
+                .ToObject<Dictionary<string, object>>(Serializer.Current);
 
             object errorType;
             if (response.TryGetValue("error type", out errorType))
@@ -46,14 +44,7 @@ namespace Assets.Code.Net
                 throw new Exception("Server error of type " + errorTypeString);
             }
 
-            var i = 0;
-            foreach (var pair in response)
-            {
-                result.Add(pair.Key, JToken.FromObject(pair.Value).ToObject(argsTypes[i]));
-                i++;
-            }
-
-            return result;
+            return response;
         } 
     }
 }

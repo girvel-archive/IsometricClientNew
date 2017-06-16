@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -7,18 +8,18 @@ using Assets.Code.Common;
 using Assets.Code.Net;
 using Assets.Code.Ui;
 using Isometric.Core;
-using UnityEngine;
-using Resources = UnityEngine.Resources;
 
 namespace Assets.Code
 {
     public class NetManager : SingletonBehaviour<NetManager>
     {
-        private RequestProcessor _requestProcessor;
+        private IsometricRequestProcessor _requestProcessor;
 
         private Connection _connection;
         
         private readonly Encoding _encoding = Encoding.UTF8;
+
+        public bool Runned { get; private set; }
 
 
 
@@ -30,7 +31,7 @@ namespace Assets.Code
                     7999));
             _connection.Start();
 
-            _requestProcessor = new RequestProcessor(_connection);
+            _requestProcessor = new IsometricRequestProcessor(_connection);
 
             _requestProcessor.Request(
                 "login",
@@ -38,55 +39,48 @@ namespace Assets.Code
                 {
                         {"login", login},
                         {"password", password}
-                },
-                typeof(bool));
+                });
 
             BuildingsManager.Current.ShowArea(
                 (Area)_requestProcessor.Request(
                     RequestType.GetArea,
-                    new Dictionary<string, object>(),
-                    typeof(Area))["area"]);
+                    new Dictionary<string, object>())["area"]);
 
-            UiManager.Current.ShowResources(
-                (Isometric.Core.Resources)_requestProcessor.Request(
-                    "get resources",
-                    new Dictionary<string, object>(),
-                    typeof(Isometric.Core.Resources))["resources"]);
+            UiManager.Current.ShowResources(_requestProcessor.GetResources());
 
-            if ((bool)_requestProcessor.Request(
-                "upgrade",
-                new Dictionary<string, object>
-                {
-                        {"to", "House"},
-                        {"position", new Vector(0, 0)}
-                },
-                typeof(bool))["success"])
-            {
-                BuildingsManager.Current.SetBuilding(new Vector2(0, 0), "House");
-            }
+            Runned = true;
         }
-
-        public bool TryUpgrade(string name, Vector position)
-        {
-            return (bool) _requestProcessor.Request(
-                "upgrade",
-                new Dictionary<string, object>
-                {
-                    {"to", name},
-                    {"position", position},
-                }, 
-                typeof(bool))["success"];
-        }
-
-
-
+        
         private void FixedUpdate()
         {
+            if (Runned)
+            {
+                UiManager.Current.ShowResources(_requestProcessor.GetResources());
+            }
         }
 
         private void OnDestroy()
         {
-            _connection.Dispose();
+            if (_connection != null)
+            {
+                _connection.Dispose();
+            }
+        }
+
+
+
+        public bool TryUpgrade(string upgradeName, Vector position, out TimeSpan time)
+        {
+            var response = _requestProcessor.Request(
+                "upgrade",
+                new Dictionary<string, object>
+                {
+                    {"to", upgradeName},
+                    {"position", position},
+                });
+
+            time = (TimeSpan) response["upgrade time"];
+            return (bool)     response["success"];
         }
     }
 }

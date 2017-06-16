@@ -1,4 +1,5 @@
-﻿using Assets.Code.Building;
+﻿using System;
+using Assets.Code.Building;
 using Assets.Code.Common;
 using UnityEngine;
 
@@ -10,9 +11,10 @@ namespace Assets.Code.Ui
         {
             var position = BuildingsManager.Current.SelectedBuilding.Position;
 
-            if (NetManager.Current.TryUpgrade("House", position.ToIsometricVector()))
+            TimeSpan upgradeTime;
+            if (NetManager.Current.TryUpgrade("House", position, out upgradeTime))
             {
-                BuildingsManager.Current.SetBuilding(position, "House");
+                BuildingsManager.Current.SetUpgrade(position, "House", upgradeTime);
             }
         }
     }

@@ -27,12 +27,6 @@ namespace Assets.Code.Building
         {
             if (IsometricPosition != LastIsometricPosition)
             {
-                transform.position = new Vector2(
-                    0.5f * DefaultPlatformSize.x * transform.localScale.x *
-                        (IsometricPosition.y - IsometricPosition.x),
-                    0.5f * DefaultPlatformSize.y * transform.localScale.y *
-                        (IsometricPosition.y + IsometricPosition.x));
-
                 GetComponent<SpriteRenderer>().sortingOrder = -(int) (IsometricPosition.x + IsometricPosition.y);
 
                 LastIsometricPosition = IsometricPosition;
@@ -48,13 +42,14 @@ namespace Assets.Code.Building
                 IsometricPosition = new Vector2(
                     (roundy - roundx) * 0.5f,
                     (roundx + roundy) * 0.5f);
-
-                transform.position = new Vector2(
-                    0.5f * DefaultPlatformSize.x * transform.localScale.x *
-                        (IsometricPosition.y - IsometricPosition.x),
-                    0.5f * DefaultPlatformSize.y * transform.localScale.y *
-                        (IsometricPosition.y + IsometricPosition.x));
             }
+
+            transform.position = new Vector2(
+                0.5f * DefaultPlatformSize.x * transform.localScale.x *
+                    (IsometricPosition.y - IsometricPosition.x),
+                0.5f * DefaultPlatformSize.y * transform.localScale.y *
+                    (IsometricPosition.y + IsometricPosition.x));
+
             LastPosition = transform.position;
         }
     }
