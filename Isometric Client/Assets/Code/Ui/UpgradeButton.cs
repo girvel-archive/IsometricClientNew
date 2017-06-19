@@ -14,6 +14,7 @@ namespace Assets.Code.Ui
             TimeSpan upgradeTime;
             if (NetManager.Current.TryUpgrade("House", position, out upgradeTime))
             {
+                Debug.Log(upgradeTime);
                 BuildingsManager.Current.SetUpgrade(position, "House", upgradeTime);
             }
         }

@@ -42,9 +42,9 @@ namespace Assets.Code
                 });
 
             BuildingsManager.Current.ShowArea(
-                (Area)_requestProcessor.Request(
+                (Isometric.Core.Building[,])_requestProcessor.Request(
                     RequestType.GetArea,
-                    new Dictionary<string, object>())["area"]);
+                    new Dictionary<string, object>())["buildings"]);
 
             UiManager.Current.ShowResources(_requestProcessor.GetResources());
 

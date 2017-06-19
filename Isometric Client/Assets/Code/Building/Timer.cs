@@ -25,7 +25,7 @@ namespace Assets.Code.Building
         {
             if (Value > TimeSpan.Zero)
             {
-                Value -= new TimeSpan((int)(Time.deltaTime * TimeSpan.TicksPerSecond));
+                Value -= new TimeSpan((long) (Time.deltaTime * TimeSpan.TicksPerSecond));
             }
             else
             {
