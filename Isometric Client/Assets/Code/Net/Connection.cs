@@ -26,7 +26,7 @@ namespace Assets.Code.Net
 
         public void Start()
         {
-            _socket = new Socket(Dns.GetHostAddresses(Dns.GetHostName()).First().AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _socket.Connect(ServerEndPoint);
         }
         

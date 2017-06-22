@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Net;
+using Assets.Code.Net;
+using UnityEngine;
 
 namespace Assets.Code.Ui
 {
@@ -8,9 +10,11 @@ namespace Assets.Code.Ui
         {
             NetManager.Current.Run(
                 UiManager.Current.LoginInputField.text,
-                UiManager.Current.PasswordInputField.text);
+                UiManager.Current.PasswordInputField.text,
+                IPAddress.Parse(UiManager.Current.IpInputField.text));
 
             UiManager.Current.LoginForm.SetActive(false);
+            UiManager.Current.GameUiForm.SetActive(true);
         }
     }
 }

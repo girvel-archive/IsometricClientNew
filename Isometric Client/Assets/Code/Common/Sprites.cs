@@ -7,6 +7,9 @@ namespace Assets.Code.Common
         public Sprite
             UsualPlain,
             HighlightedPlain,
-            SelectedPlain;
+            SelectedPlain,
+            UpgradeIcon,
+            IncrementWorkers,
+            DecrementWorkers;
     }
 }

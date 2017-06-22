@@ -1,5 +1,6 @@
 ﻿using System;
 using Assets.Code.Common;
+using Assets.Code.Ui;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,7 @@ namespace Assets.Code.Building
             }
             else
             {
+                UiManager.Current.RefreshSelectedBuilding();
                 Destroy(gameObject);
             }
         }
