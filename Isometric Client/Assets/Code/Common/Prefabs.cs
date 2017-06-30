@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Code.Common
 {
@@ -9,6 +10,27 @@ namespace Assets.Code.Common
             Plain,
             Forest,
             House,
-            BuildingTimer;
+            BuildingTimer,
+            TableButton;
+
+
+
+        public GameObject GetPrefab(string serverName)
+        {
+            switch (serverName)
+            {
+                case "Plain":
+                    return Plain;
+
+                case "Forest":
+                    return Forest;
+
+                case "House":
+                    return House;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

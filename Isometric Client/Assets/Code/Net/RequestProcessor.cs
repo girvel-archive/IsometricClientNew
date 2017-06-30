@@ -18,7 +18,7 @@ namespace Assets.Code.Net
 
 
 
-        public Dictionary<string, object> Request(string type, Dictionary<string, object> args)
+        public Dictionary<string, object> Request(string type, Dictionary<string, object> args = null)
         {
             var serializer = JsonSerializer.Create(new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects});
 
@@ -27,7 +27,7 @@ namespace Assets.Code.Net
                     new JObject
                     {
                         {"type", type},
-                        {"args", JToken.FromObject(args, serializer)}
+                        {"args", JToken.FromObject(args ?? new Dictionary<string, object>(), serializer)}
                     }.ToString()))
                 .ToObject<Dictionary<string, object>>(Serializer.Current);
 

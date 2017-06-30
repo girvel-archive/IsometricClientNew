@@ -1,8 +1,8 @@
 ﻿using System;
 using Assets.Code.Common;
+using Assets.Code.Common.Helpers;
+using Assets.Code.Interface;
 using Assets.Code.Net;
-using Assets.Code.Ui;
-using Assets.Code.Ui.Table;
 using UnityEngine;
 
 namespace Assets.Code.Building
@@ -11,7 +11,7 @@ namespace Assets.Code.Building
     {
         private void OnMouseDown()
         {
-            UiManager.Current.SelectBuilding(GetComponent<IsometricController>().IsometricPosition.ToIsometricVector());
+            GameUi.Current.SelectBuilding(GetComponent<IsometricController>().IsometricPosition.ToIsometricVector());
         }
 
         private void OnMouseEnter()
@@ -23,7 +23,7 @@ namespace Assets.Code.Building
 
             if (BuildingsManager.Current.SelectedBuilding == null)
             {
-                UiManager.Current.ShowInformation(
+                GameUi.Current.ShowInformation(
                     GetComponent<IsometricController>().IsometricPosition.ToIsometricVector());
             }
         }

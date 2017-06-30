@@ -5,7 +5,8 @@ using System.Net;
 using System.Text;
 using Assets.Code.Building;
 using Assets.Code.Common;
-using Assets.Code.Ui;
+using Assets.Code.Common.Helpers;
+using Assets.Code.Interface;
 using Isometric.Core;
 using UnityEngine;
 using Resources = Isometric.Core.Resources;
@@ -39,12 +40,9 @@ namespace Assets.Code.Net
                     {"password", password}
                 });
 
-            BuildingsManager.Current.ShowArea(
-                (string[,]) _requestProcessor.Request(
-                    RequestType.GetArea,
-                    new Dictionary<string, object>())["buildings names"]);
+            BuildingsManager.Current.ShowArea(GetArea());
 
-            UiManager.Current.ShowResources(GetResources());
+            GameUi.Current.ShowResources(GetResources());
 
             Runned = true;
         }
@@ -58,7 +56,7 @@ namespace Assets.Code.Net
                 if (_resourcesRequestDelay < 0)
                 {
                     _resourcesRequestDelay += ResourcesRequestDelayDefault;
-                    UiManager.Current.ShowResources(GetResources());
+                    GameUi.Current.ShowResources(GetResources());
                 }
             }
         }
@@ -76,6 +74,17 @@ namespace Assets.Code.Net
 
 
 
+        public MainBuildingInfo[,] GetArea()
+        {
+            return ((Dictionary<string, object>[,]) _requestProcessor.Request("get area")["buildings"])
+                .TwoDimSelect(
+                    b => new MainBuildingInfo
+                    {
+                        Name = (string) b["name"],
+                        BuildingTime = (TimeSpan) b["real building time"],
+                    });
+        }
+
         public bool TryUpgrade(string upgradeName, Vector position, out TimeSpan time)
         {
             var response = _requestProcessor.Request(
@@ -92,9 +101,7 @@ namespace Assets.Code.Net
         
         public Resources GetResources()
         {
-            return (Resources) _requestProcessor.Request(
-                "get resources",
-                new Dictionary<string, object>())["resources"];
+            return (Resources) _requestProcessor.Request("get resources")["resources"];
         }
 
         public string[] GetUpgrades(Vector position)
@@ -109,8 +116,19 @@ namespace Assets.Code.Net
 
         public bool TryAddWorkers(Vector position, int delta)
         {
-            return (bool) _requestProcessor.Request(
+            return (bool)_requestProcessor.Request(
                 "add workers",
+                new Dictionary<string, object>
+                {
+                    {"position", position},
+                    {"delta", delta}
+                })["success"];
+        }
+
+        public bool TryAddBuilders(Vector position, int delta)
+        {
+            return (bool)_requestProcessor.Request(
+                "add builders",
                 new Dictionary<string, object>
                 {
                     {"position", position},
@@ -152,6 +170,30 @@ namespace Assets.Code.Net
             };
         }
 
+        public string[] GetNearestResearches()
+        {
+            return (string[]) _requestProcessor.Request("get nearest researches")["names"];
+        }
+
+        public bool TryResearch(string researchName)
+        {
+            return (bool) _requestProcessor.Request(
+                "research",
+                new Dictionary<string, object>
+                {
+                    {"name", researchName},
+                })["success"];
+        }
+
+        public void GetResearchPoints(out float currentPoints, out float requiredPoints)
+        {
+            var response = _requestProcessor.Request(
+                "get research points");
+
+            currentPoints  = (float) (double) response["current points"];
+            requiredPoints = (float) (double)response["required points"];
+        }
+
 
 
         public class BuildingInfo
@@ -163,6 +205,13 @@ namespace Assets.Code.Net
             public bool Finished, IsIncomeBuilding;
 
             public Resources Income;
+        }
+
+        public class MainBuildingInfo
+        {
+            public string Name;
+
+            public TimeSpan BuildingTime;
         }
     }
 }

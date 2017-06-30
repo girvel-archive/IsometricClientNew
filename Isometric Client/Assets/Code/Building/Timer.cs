@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading;
 using Assets.Code.Common;
-using Assets.Code.Ui;
+using Assets.Code.Common.Helpers;
+using Assets.Code.Interface;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +16,7 @@ namespace Assets.Code.Building
             set
             {
                 _value = value;
-                GetComponent<TextMesh>().text = _value.ToTimerString();
+                GetComponent<TextMesh>().text = (_value + TimeSpan.FromSeconds(1)).ToTimerString();
             }
         }
 
@@ -30,7 +32,11 @@ namespace Assets.Code.Building
             }
             else
             {
-                UiManager.Current.RefreshSelectedBuilding();
+                ActionProcessor.Current.AddActionToQueue(() =>
+                {
+                    GameUi.Current.RefreshTable();
+                }, 
+                TimeSpan.FromSeconds(1));
                 Destroy(gameObject);
             }
         }

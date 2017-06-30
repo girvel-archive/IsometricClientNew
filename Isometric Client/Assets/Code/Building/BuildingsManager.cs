@@ -1,5 +1,7 @@
 ﻿using System;
 using Assets.Code.Common;
+using Assets.Code.Common.Helpers;
+using Assets.Code.Net;
 using Isometric.Core;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace Assets.Code.Building
                 Destroy(Buildings[position.X, position.Y].Building);
             }
 
-            (Buildings[position.X, position.Y].Building = Instantiate(GetPrefab(buildingName)))
+            (Buildings[position.X, position.Y].Building = Instantiate(Prefabs.Current.GetPrefab(buildingName)))
                 .GetComponent<IsometricController>()
                 .IsometricPosition = position.ToVector2();
         }
@@ -34,58 +36,56 @@ namespace Assets.Code.Building
         {
             var image = Buildings[position.X, position.Y];
 
-            image.Timer = Instantiate(
-                Prefabs.Current.BuildingTimer,
-                image.Building.transform.position - new Vector3(0, 0.5f, 0),
-                new Quaternion())
-                .GetComponent<Timer>();
-
-            image.Timer.Value = time;
             SetBuilding(position, buildingName);
+
+            image.Timer = NewTimer(image.Building.transform, time);
         }
 
-        public void ShowArea(string[,] names)
+        public void ShowArea(NetManager.MainBuildingInfo[,] buildings)
         {
-            Buildings = new BuildingImage[names.GetLength(0), names.GetLength(1)];
+            Buildings = new BuildingImage[buildings.GetLength(0), buildings.GetLength(1)];
 
-            for (var x = 0; x < names.GetLength(0); x++)
+            for (var x = 0; x < buildings.GetLength(0); x++)
             {
-                for (var y = 0; y < names.GetLength(1); y++)
+                for (var y = 0; y < buildings.GetLength(1); y++)
                 {
+                    var b = buildings[x, y];
+
                     Buildings[x, y] = new BuildingImage
                     {
                         Holder = Instantiate(Prefabs.Current.Holder),
                         Position = new Vector(x, y),
-                        Name = names[x, y]
+                        Name = b.Name,
                     };
+
+                    SetBuilding(new Vector(x, y), b.Name);
+
+                    Buildings[x, y].Timer = b.BuildingTime > TimeSpan.Zero
+                        ? NewTimer(
+                            Buildings[x, y].Building.transform,
+                            b.BuildingTime)
+                        : null;
                     
                     Buildings[x, y].Holder
                         .GetComponent<IsometricController>()
                         .IsometricPosition = new Vector2(x, y);
-
-                    SetBuilding(new Vector(x, y), names[x, y]);
                 }
             }
         }
 
 
 
-        private static GameObject GetPrefab(string buildingName)
+        private static Timer NewTimer(Transform parentBuildingTransform, TimeSpan time)
         {
-            switch (buildingName)
-            {
-                case "Plain":
-                    return Prefabs.Current.Plain;
+            var result = Instantiate(
+                Prefabs.Current.BuildingTimer,
+                new Vector3(0, -0.5f, -1),
+                new Quaternion(),
+                parentBuildingTransform)
+                .GetComponent<Timer>();
 
-                case "Forest":
-                    return Prefabs.Current.Forest;
-
-                case "House":
-                    return Prefabs.Current.House;
-
-                default:
-                    throw new NotImplementedException();
-            }
+            result.Value = time;
+            return result;
         }
     }
 }
