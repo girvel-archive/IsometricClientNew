@@ -15,29 +15,50 @@ namespace Assets.Code.Building
             get { return _value; }
             set
             {
+                _infinite = false;
                 _value = value;
                 GetComponent<TextMesh>().text = (_value + TimeSpan.FromSeconds(1)).ToTimerString();
             }
         }
 
-        private TimeSpan _value;
+        public bool Infinite
+        {
+            get { return _infinite; }
+            set
+            {
+                _infinite = value;
+                if (Infinite)
+                { 
+                    GetComponent<TextMesh>().text = "∞";
+                }
+                else
+                {
+                    Value = Value;
+                }
+            }
+        }
 
+        private TimeSpan _value;
+        private bool _infinite;
 
 
         private void Update()
         {
-            if (Value > TimeSpan.Zero)
+            if (!Infinite)
             {
-                Value -= new TimeSpan((long) (Time.deltaTime * TimeSpan.TicksPerSecond));
-            }
-            else
-            {
-                ActionProcessor.Current.AddActionToQueue(() =>
+                if (Value > TimeSpan.Zero)
                 {
-                    GameUi.Current.RefreshTable();
-                }, 
-                TimeSpan.FromSeconds(1));
-                Destroy(gameObject);
+                    Value -= new TimeSpan((long) (Time.deltaTime * TimeSpan.TicksPerSecond));
+                }
+                else
+                {
+                    ActionProcessor.Current.AddActionToQueue(() =>
+                    {
+                        GameUi.Current.RefreshTable();
+                    },
+                        TimeSpan.FromSeconds(1));
+                    Destroy(gameObject);
+                }
             }
         }
     }

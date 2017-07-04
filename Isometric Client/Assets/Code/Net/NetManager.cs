@@ -9,7 +9,6 @@ using Assets.Code.Common.Helpers;
 using Assets.Code.Interface;
 using Isometric.Core;
 using UnityEngine;
-using Resources = Isometric.Core.Resources;
 
 namespace Assets.Code.Net
 {
@@ -99,9 +98,9 @@ namespace Assets.Code.Net
             return (bool)     response["success"];
         }
         
-        public Resources GetResources()
+        public float[] GetResources()
         {
-            return (Resources) _requestProcessor.Request("get resources")["resources"];
+            return (float[]) _requestProcessor.Request("get resources")["resources"];
         }
 
         public string[] GetUpgrades(Vector position)
@@ -166,13 +165,22 @@ namespace Assets.Code.Net
                 MaxWorkers = (int) (long) response["max workers"],
                 Finished = (bool) response["finished"],
                 IsIncomeBuilding = (bool) response["is income building"],
-                Income = (Resources) response["income"],
+                IsWorkerBuilding = (bool) response["is worker building"],
+                Income = (float[]) response["income"],
             };
         }
 
-        public string[] GetNearestResearches()
+        public ResearchInfo[] GetNearestResearches(out string current)
         {
-            return (string[]) _requestProcessor.Request("get nearest researches")["names"];
+            var response = _requestProcessor.Request("get nearest researches");
+
+            current = (string) response["current"];
+            return ((Dictionary<string, object>[]) response["researches"]).Select(
+                r => new ResearchInfo
+                {
+                    Name = (string) r["name"],
+                    NewBuildings = (string[]) r["new buildings"],
+                }).ToArray();
         }
 
         public bool TryResearch(string researchName)
@@ -185,13 +193,13 @@ namespace Assets.Code.Net
                 })["success"];
         }
 
-        public void GetResearchPoints(out float currentPoints, out float requiredPoints)
+        public void GetResearchPoints(out float currentPoints, out float requiredPoints, out float pointsPerMinute)
         {
-            var response = _requestProcessor.Request(
-                "get research points");
-
-            currentPoints  = (float) (double) response["current points"];
-            requiredPoints = (float) (double)response["required points"];
+            var response = _requestProcessor.Request("get research points");
+             
+            currentPoints   = (float) (double) response["current points"];
+            requiredPoints  = (float) (double) response["required points"];
+            pointsPerMinute = (float) (double) response["points per minute"];
         }
 
 
@@ -202,9 +210,9 @@ namespace Assets.Code.Net
 
             public int People, Builders, MaxBuilders, Workers, MaxWorkers;
 
-            public bool Finished, IsIncomeBuilding;
+            public bool Finished, IsIncomeBuilding, IsWorkerBuilding;
 
-            public Resources Income;
+            public float[] Income;
         }
 
         public class MainBuildingInfo
@@ -212,6 +220,13 @@ namespace Assets.Code.Net
             public string Name;
 
             public TimeSpan BuildingTime;
+        }
+
+        public class ResearchInfo
+        {
+            public string Name;
+
+            public string[] NewBuildings;
         }
     }
 }

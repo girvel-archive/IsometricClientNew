@@ -10,6 +10,7 @@ namespace Assets.Code.Net
                 {
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                     TypeNameHandling = TypeNameHandling.Objects,
+                    FloatParseHandling = FloatParseHandling.Decimal,
                 });
     }
 }

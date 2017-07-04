@@ -11,3 +11,21 @@ E:\projects\dummies\unity\Isometric Client.CSharp.Tests\bin\Debug\ru\Microsoft.V
 E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.csprojResolveAssemblyReference.cache
 E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.dll
 E:\projects\dummies\unity\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.pdb
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Isometric Client.CSharp.Tests.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Isometric Client.CSharp.Tests.pdb
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Assembly-CSharp.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Newtonsoft.Json.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Isometric.Core.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.UI.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEditor.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Assembly-CSharp.pdb
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\Newtonsoft.Json.xml
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.xml
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEngine.UI.xml
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\UnityEditor.xml
+E:\projects\isometric client\Isometric Client.CSharp.Tests\bin\Debug\ru\Microsoft.VisualStudio.QualityTools.UnitTestFramework.resources.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.csprojResolveAssemblyReference.cache
+E:\projects\isometric client\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.dll
+E:\projects\isometric client\Isometric Client.CSharp.Tests\obj\Debug\Isometric Client.CSharp.Tests.pdb

@@ -13,7 +13,9 @@ namespace Assets.Code.Common
             IncrementWorkers,
             DecrementWorkers,
             Number0,
-            Number1;
+            Number1,
+            Instruments,
+            Agriculture;
 
 
 
@@ -25,8 +27,8 @@ namespace Assets.Code.Common
             base.Start();
             _spritesByNames = new Dictionary<string, Sprite>
             {
-                {"Орудия труда", Number0},
-                {"Земледелие", Number1},
+                {"Орудия труда", Instruments},
+                {"Земледелие", Agriculture},
             };
         }
 

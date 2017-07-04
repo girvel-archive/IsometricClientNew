@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Assets.Code.Interface.Table
 {
-    public class TableButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class TableButton : HotkeyButton, IPointerEnterHandler, IPointerExitHandler
     {
         public Action<TableButton> Click = b => { };
 
@@ -18,28 +18,25 @@ namespace Assets.Code.Interface.Table
 
         public string Description { get; set; }
 
-        public KeyCode Hotkey
+        public Text InformationText;
+
+        private bool _isMouseOver;
+
+
+        protected override void Update()
         {
-            get { return _hotkey; }
-            set
+            base.Update();
+
+            if (_isMouseOver)
             {
-                HotkeyText.text = Hotkey.ToString();
-                _hotkey = value;
-            }
-        }
-        private KeyCode _hotkey;
-
-        public Text HotkeyText, InformationText;
-
-
-        private void Update()
-        {
-            if (UnityEngine.Input.GetKeyDown(Hotkey))
-            {
-                OnClick();
+                InformationPanel.Current.Text = Description + "\n";
             }
         }
 
+        protected override void OnHotkeyPress()
+        {
+            OnClick();
+        }
 
 
         public void OnClick()
@@ -54,11 +51,12 @@ namespace Assets.Code.Interface.Table
         
         public void OnPointerEnter(PointerEventData data)
         {
-            InformationPanel.Current.Text = Description + "\n";
+            _isMouseOver = true;
         }
 
         public void OnPointerExit(PointerEventData data)
         {
+            _isMouseOver = false;
             if (BuildingsManager.Current.SelectedBuilding == null)
             {
                 InformationPanel.Current.Text = "";
@@ -67,6 +65,12 @@ namespace Assets.Code.Interface.Table
             {
                 GameUi.Current.RefreshTable();
             }
+        }
+
+        public void SetMode(bool showHotkey)
+        {
+            HotkeyText.gameObject.SetActive(showHotkey);
+            InformationText.gameObject.SetActive(!showHotkey);
         }
     }
 }

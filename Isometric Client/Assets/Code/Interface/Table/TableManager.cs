@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Code.Common;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Code.Interface.Table
 {
@@ -54,6 +55,9 @@ namespace Assets.Code.Interface.Table
         {
             foreach (var button in Buttons)
             {
+                button.Description = "";
+                button.SetMode(true);
+                button.GetComponent<Button>().interactable = true;
                 button.gameObject.SetActive(false);
             }
         }

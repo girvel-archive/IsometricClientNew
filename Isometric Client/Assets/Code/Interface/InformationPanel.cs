@@ -26,11 +26,15 @@ namespace Assets.Code.Interface
                     info.Name,
                     info.OwnerName,
                     info.People)
+                + (info.IsIncomeBuilding || info.IsWorkerBuilding ? "\n" : "")
                 + (info.IsIncomeBuilding
                     ? string.Format(
-                        "\nIncome: {0}\n" +
-                        "Workers: {1}/{2}\n",
-                        info.Income.ToFormattedString(),
+                        "Income: {0}\n",
+                        info.Income.ToFormattedString())
+                    : "")
+                + (info.IsWorkerBuilding
+                    ? string.Format(
+                        "Workers: {0}/{1}\n",
                         info.Workers,
                         info.MaxWorkers)
                     : "");

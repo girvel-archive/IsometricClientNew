@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Assets.Code.Building;
@@ -9,13 +10,33 @@ using Isometric.Core;
 using Isometric.Core.Common;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Code.Common.Helpers;
 
 namespace Assets.Code.Interface
 {
     public class GameUi : SingletonBehaviour<GameUi>
     {
-        public UiMode Mode;
+        public UiMode Mode
+        {
+            get { return _mode; }
+            set
+            {
+                ModeButtons[(int) Mode].SetActiveFrame(false);
+                _mode = value;
+                ModeButtons[(int) Mode].SetActiveFrame(true);
+            }
+        }
+        private UiMode _mode;
 
+        public ModeButton[] ModeButtons;
+
+
+        protected override void Start()
+        {
+            base.Start();
+
+            Mode = UiMode.Building;
+        }
 
         private void Update()
         {
@@ -27,12 +48,12 @@ namespace Assets.Code.Interface
 
 
 
-        public void ShowResources(Isometric.Core.Resources resources)
+        public void ShowResources(float[] resources)
         {
             Ui.Current.ResourcesText.text =
                 string.Format(
                     "Wood: {0}\nFood: {1}",
-                    resources.GetResourcesArray().Select(r => (object)((int)r).ToString()).ToArray());
+                    resources.Select(r => (object)((int)r).ToString()).ToArray());
         }
 
 
@@ -51,47 +72,77 @@ namespace Assets.Code.Interface
 
         public void RefreshResearches()
         {
+            Action<TableButton, NetManager.ResearchInfo> showResearchProgress = (b, research) =>
+            {
+                b.SetMode(false);
+                b.InformationText.text = "";
+                b.GetComponent<Button>().interactable = false;
+
+                ActionProcessor.Current.AddActionToQueue(
+                    () =>
+                    {
+                        if (Current.Mode != UiMode.Research) return true;
+
+                        float current, required, perMinute;
+                        NetManager.Current.GetResearchPoints(out current, out required, out perMinute);
+
+                        if (current >= required)
+                        {
+                            RefreshTable();
+                            return true;
+                        }
+
+                        b.InformationText.text = (int) (current / required * 100) + "%";
+                        b.Description =
+                            "Research {0} ({1}/{2})\n\nPoints per minute: {3}\nNew buildings: {4}"
+                                .FormatBy(
+                                    research.Name,
+                                    (int) current,
+                                    (int) required,
+                                    (int) perMinute,
+                                    research.NewBuildings.Any()
+                                        ? research.NewBuildings
+                                            .Aggregate("", (sum, buildingName) => sum + ", " + buildingName)
+                                            .Substring(2)
+                                        : ""); // TODO optimize
+
+                        return false;
+                    },
+                    TimeSpan.FromSeconds(1));
+            };
+
             TableManager.Current.Clear();
 
-            var researches = NetManager.Current.GetNearestResearches();
+            string currentResearch;
+            var researches = NetManager.Current.GetNearestResearches(out currentResearch);
             for (var i = 0; i < researches.Length; i++)
             {
                 var research = researches[i];
 
+                if (research.Name == currentResearch)
+                {
+                    showResearchProgress(TableManager.Current.Buttons[i], research);
+                }
+
                 TableManager.Current.SetButton(
                     i % 5,
                     i / 5,
-                    Sprites.Current.GetResearchSprite(research),
+                    Sprites.Current.GetResearchSprite(research.Name),
                     b =>
                     {
-                        if (NetManager.Current.TryResearch(research))
+                        if (NetManager.Current.TryResearch(research.Name))
                         {
-                            b.HotkeyText.gameObject.SetActive(false);
-                            b.InformationText.gameObject.SetActive(true);
-                            b.InformationText.text = "0%";
-                            b.GetComponent<Button>().interactable = false;
-
-                            ActionProcessor.Current.AddActionToQueue(() =>
-                            {
-                                if (Current.Mode != UiMode.Research) return true;
-
-                                float current, required;
-                                NetManager.Current.GetResearchPoints(out current, out required);
-
-                                if (current >= required)
-                                {
-                                    RefreshTable();
-                                    return true;
-                                }
-
-                                b.InformationText.text = (int) (current / required * 100) + "%";
-
-                                return false;
-                            }, 
-                            TimeSpan.FromSeconds(1));
+                            showResearchProgress(b, research);
                         }
                     },
-                    "Research " + research);
+                    "Research {0}\n\nNew buildings: {1}"
+                        .FormatBy(
+                            research.Name,
+                            research.NewBuildings.Any()
+                                ? research.NewBuildings
+                                    .Aggregate("", (sum, buildingName) => sum + ", " + buildingName)
+                                    .Substring(2)
+                                : "")); // TODO optimize);
             }
         }
 
@@ -102,9 +153,10 @@ namespace Assets.Code.Interface
 
         public void SelectBuilding(Vector buildingPosition)
         {
-            ClearBuildingSelection();
             if (Mode == UiMode.Building)
             {
+                ClearBuildingSelection();
+
                 BuildingsManager.Current.Buildings[buildingPosition.X, buildingPosition.Y].Holder
                     .GetComponent<SpriteRenderer>().sprite = Sprites.Current.SelectedPlain;
 
@@ -132,7 +184,7 @@ namespace Assets.Code.Interface
                 ActionProcessor.Current.AddActionToQueue(() =>
                 {
                     var info = NetManager.Current.GetBuildingInfo(buildingPosition);
-                    if ((!info.Finished && info.MaxBuilders > 0) || (info.Finished && info.IsIncomeBuilding && info.MaxWorkers > 0))
+                    if ((!info.Finished && info.MaxBuilders > 0) || (info.Finished && info.IsWorkerBuilding && info.MaxWorkers > 0))
                     {
                         TableManager.Current.SetButton(
                             0, 0, Sprites.Current.IncrementWorkers,
@@ -145,7 +197,14 @@ namespace Assets.Code.Interface
                                         var timer =
                                             BuildingsManager.Current.Buildings[buildingPosition.X, buildingPosition.Y]
                                                 .Timer;
-                                        timer.Value = timer.Value.Multiple(1 - 1.0f / (info.Builders + 1));
+                                        if (timer.Infinite)
+                                        {
+                                            timer.Infinite = false;
+                                        }
+                                        else
+                                        {
+                                            timer.Value = timer.Value.Multiple(1 - 1.0f / (info.Builders + 1));
+                                        }
                                     }
                                 }),
                             "Adds one " + (info.Finished ? "worker" : "builder"));
@@ -161,9 +220,14 @@ namespace Assets.Code.Interface
                                         var timer =
                                             BuildingsManager.Current.Buildings[buildingPosition.X, buildingPosition.Y]
                                                 .Timer;
-
-                                        Debug.Log(1 + 1.0f / (info.Builders - 1));
-                                        timer.Value = timer.Value.Multiple(1 + 1.0f / (info.Builders - 1));
+                                        if (info.Builders <= 1)
+                                        {
+                                            timer.Infinite = true;
+                                        }
+                                        else
+                                        {
+                                            timer.Value = timer.Value.Multiple(1 + 1.0f / (info.Builders - 1));
+                                        }
                                     }
                                 }),
                             "Removes one " + (info.Finished ? "worker" : "builder"));
