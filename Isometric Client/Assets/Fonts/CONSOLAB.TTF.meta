@@ -3,16 +3,22 @@ guid: 6c460ad255b56f54bb3b968a7d6b0c82
 timeCreated: 1466665338
 licenseType: Free
 TrueTypeFontImporter:
-  serializedVersion: 2
+  serializedVersion: 4
   fontSize: 16
   forceTextureCase: -2
-  characterSpacing: 1
-  characterPadding: 0
+  characterSpacing: 0
+  characterPadding: 1
   includeFontData: 1
-  use2xBehaviour: 0
-  fontNames: []
+  fontName: Consolas
+  fontNames:
+  - Consolas
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: aaa1ab535578820418a5f49d432e9cbe, type: 3}
+  - {fileID: 12800000, guid: c08a9eaaa39307e448488059c9dbe42b, type: 3}
+  - {fileID: 12800000, guid: e44686ce9cd75c04bade30f8580a51e9, type: 3}
   customCharacters: 
-  fontRenderingMode: 0
+  fontRenderingMode: 3
+  ascentCalculationMode: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 

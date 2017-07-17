@@ -11,7 +11,8 @@ namespace Assets.Code.Common
             Forest,
             House,
             BuildingTimer,
-            TableButton;
+            TableButton, 
+            Army;
 
 
 

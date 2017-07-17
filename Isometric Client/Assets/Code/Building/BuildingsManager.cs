@@ -1,19 +1,50 @@
 ﻿using System;
+using System.Linq;
 using Assets.Code.Common;
 using Assets.Code.Common.Helpers;
+using Assets.Code.Interface;
 using Assets.Code.Net;
-using Isometric.Core;
+using Isometric.Core.Vectors;
+using Isometric.Dtos;
 using UnityEngine;
 
 namespace Assets.Code.Building
 {
     public class BuildingsManager : SingletonBehaviour<BuildingsManager>
     {
+        public BuildingImage this[Vector position]
+        {
+            get { return Buildings[position.X, position.Y]; }
+            set { Buildings[position.X, position.Y] = value; }
+        }
+
+
+
         public BuildingImage SelectedBuilding { get; set; }
 
         public BuildingImage[,] Buildings;
 
 
+
+        public void SelectBuilding(Vector position)
+        {
+            ClearBuildingSelection();
+
+            SelectedBuilding = Buildings[position.X, position.Y];
+            
+            SelectedBuilding.Holder.GetComponent<SpriteRenderer>().sprite
+                = Sprites.Current.SelectedPlain;
+        }
+
+        public void ClearBuildingSelection()
+        {
+            if (SelectedBuilding != null)
+            {
+                SelectedBuilding.Holder.GetComponent<SpriteRenderer>().sprite
+                    = Sprites.Current.UsualPlain;
+                SelectedBuilding = null;
+            }
+        }
 
         public void SetBuilding(Vector position, string buildingName)
         {
@@ -22,14 +53,33 @@ namespace Assets.Code.Building
                 throw new NullReferenceException("Call ShowArea() before SetBuilding()");
             }
 
-            if (Buildings[position.X, position.Y].Building != null)
-            {
-                Destroy(Buildings[position.X, position.Y].Building);
-            }
+            var oldBuilding = Buildings[position.X, position.Y].Building;
 
-            (Buildings[position.X, position.Y].Building = Instantiate(Prefabs.Current.GetPrefab(buildingName)))
+            var newBuilding 
+                = Buildings[position.X, position.Y].Building 
+                = Instantiate(
+                    Prefabs.Current.GetPrefab(buildingName), 
+                    GameObjects.Current.BuildingsContainer.transform);
+            
+            newBuilding
                 .GetComponent<IsometricController>()
                 .IsometricPosition = position.ToVector2();
+
+            if (oldBuilding != null)
+            {
+                Destroy(oldBuilding);
+
+                foreach (var child in oldBuilding.GetComponentsInChildren<Transform>())
+                {
+                    child.SetParent(newBuilding.transform, false);
+                }
+
+                if (Buildings[position.X, position.Y].Army != null)
+                {
+                    Buildings[position.X, position.Y].Army.GetComponent<SpriteRenderer>().sprite =
+                        Sprites.Current.GetArmySpriteForBuilding(buildingName);
+                }
+            }
         }
 
         public void SetUpgrade(Vector position, string buildingName, TimeSpan time)
@@ -38,11 +88,49 @@ namespace Assets.Code.Building
 
             SetBuilding(position, buildingName);
 
-            image.Timer = NewTimer(image.Building.transform, time);
+            SetTimer(position, time);
+            image.Name = buildingName;
         }
 
-        public void ShowArea(NetManager.MainBuildingInfo[,] buildings)
+        public void SetArmy(Vector position)
         {
+            var image = this[position];
+
+            if (image.Army != null)
+            {
+                return;
+            }
+
+            image.Army = Instantiate(
+                Prefabs.Current.Army,
+                image.Building.transform.position,
+                new Quaternion(),
+                image.Building.transform);
+
+            Debug.Log(image.Name);
+
+            image.Army.GetComponent<SpriteRenderer>().sprite =
+                Sprites.Current.GetArmySpriteForBuilding(image.Name);
+        }
+
+        public void RemoveArmy(Vector position)
+        {
+            Debug.Log(this[position].Army.name);
+            Destroy(this[position].Army);
+            this[position].Army = null;
+        }
+
+        public void ShowArea(BuildingAreaDto[,] buildings)
+        {
+            foreach (
+                var childTransform 
+                in GameObjects.Current.BuildingsContainer.transform
+                    .GetComponentsInChildren<Transform>()
+                    .Where(c => c.gameObject != GameObjects.Current.BuildingsContainer))
+            {
+                Destroy(childTransform.gameObject);
+            }
+
             Buildings = new BuildingImage[buildings.GetLength(0), buildings.GetLength(1)];
 
             for (var x = 0; x < buildings.GetLength(0); x++)
@@ -51,41 +139,68 @@ namespace Assets.Code.Building
                 {
                     var b = buildings[x, y];
 
-                    Buildings[x, y] = new BuildingImage
+                    var image = Buildings[x, y] = new BuildingImage
                     {
-                        Holder = Instantiate(Prefabs.Current.Holder),
+                        Holder = Instantiate(
+                            Prefabs.Current.Holder,
+                            new Vector3(0, 0, -1),
+                            new Quaternion(),
+                            GameObjects.Current.BuildingsContainer.transform),
                         Position = new Vector(x, y),
                         Name = b.Name,
                     };
 
                     SetBuilding(new Vector(x, y), b.Name);
 
-                    Buildings[x, y].Timer = b.BuildingTime > TimeSpan.Zero
-                        ? NewTimer(
-                            Buildings[x, y].Building.transform,
-                            b.BuildingTime)
-                        : null;
+                    image.Indicator =
+                        Instantiate(
+                            Prefabs.Current.BuildingTimer,
+                            Buildings[x, y].Building.transform.position + new Vector3(0, -0.75f, -1),
+                            new Quaternion(),
+                            Buildings[x, y].Building.transform)
+                            .GetComponent<Indicator>();
+
+                    if (b.BuildingTime > TimeSpan.Zero)
+                    {
+                        image.Indicator.Manager = new Timer(b.BuildingTime);
+                    }
+
+                    image.Indicator.Hunger = b.ArePeopleHungry;
+
+                    if (b.IsThereArmy)
+                    {
+                        SetArmy(new Vector(x, y));
+                    }
                     
-                    Buildings[x, y].Holder
+                    image.Holder
                         .GetComponent<IsometricController>()
                         .IsometricPosition = new Vector2(x, y);
                 }
             }
         }
 
-
-
-        private static Timer NewTimer(Transform parentBuildingTransform, TimeSpan time)
+        public void SetTimer(Vector position, TimeSpan time)
         {
-            var result = Instantiate(
-                Prefabs.Current.BuildingTimer,
-                new Vector3(0, -0.5f, -1),
-                new Quaternion(),
-                parentBuildingTransform)
-                .GetComponent<Timer>();
+            if (this[position].Indicator.Manager != null)
+            {
+                this[position].Indicator.Manager.End(this[position].Indicator);
+            }
 
-            result.Value = time;
-            return result;
+            this[position].Indicator.enabled = true;
+            Debug.Log(time);
+            this[position].Indicator.Manager = new Timer(time);
+        }
+
+
+
+        private void Update()
+        {
+            if (UnityEngine.Input.GetMouseButtonDown(1))
+            {
+                ClearBuildingSelection();
+                GameUi.Current.SelectingTargetMode = false;
+                GameUi.Current.Clear();
+            }
         }
     }
 }

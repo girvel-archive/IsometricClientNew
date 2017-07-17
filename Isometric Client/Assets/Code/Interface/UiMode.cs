@@ -4,5 +4,6 @@
     {
         Building,
         Research,
+        Army,
     }
 }

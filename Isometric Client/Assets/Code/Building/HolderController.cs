@@ -11,7 +11,12 @@ namespace Assets.Code.Building
     {
         private void OnMouseDown()
         {
-            GameUi.Current.SelectBuilding(GetComponent<IsometricController>().IsometricPosition.ToIsometricVector());
+            var position = 
+                GetComponent<IsometricController>().IsometricPosition
+                .ToIsometricVector();
+
+            BuildingsManager.Current.SelectBuilding(position);
+            GameUi.Current.SelectCell(position);
         }
 
         private void OnMouseEnter()
@@ -20,11 +25,12 @@ namespace Assets.Code.Building
             {
                 GetComponent<SpriteRenderer>().sprite = Sprites.Current.HighlightedPlain;
             }
-
+            
             if (BuildingsManager.Current.SelectedBuilding == null)
             {
-                GameUi.Current.ShowInformation(
-                    GetComponent<IsometricController>().IsometricPosition.ToIsometricVector());
+                GameUi.Current.HighlightCell(
+                    GetComponent<IsometricController>().IsometricPosition
+                    .ToIsometricVector());
             }
         }
 
@@ -34,6 +40,8 @@ namespace Assets.Code.Building
             {
                 GetComponent<SpriteRenderer>().sprite = Sprites.Current.UsualPlain;
             }
+
+            GameUi.Current.ReselectLastCell();
         }
     }
 }

@@ -9,17 +9,27 @@ namespace Assets.Code.Interface
     {
         public void OnClick()
         {
-            Ui.Current.GameUiForm.SetActive(true);
-
             ActionProcessor.Current.AddActionToQueue(
                 () =>
                 {
-                    NetManager.Current.Run(
-                        Ui.Current.LoginInputField.text,
-                        Ui.Current.PasswordInputField.text,
-                        IPAddress.Parse(Ui.Current.IpInputField.text));
+                    try
+                    {
+                        NetManager.Current.Run(
+                            Ui.Current.LoginInputField.text,
+                            Ui.Current.PasswordInputField.text,
+                            IPAddress.Parse(Ui.Current.IpInputField.text));
 
-                    Ui.Current.LoginForm.SetActive(false);
+                        Ui.Current.GameUiForm.SetActive(true);
+                        Ui.Current.LoginForm.SetActive(false);
+                    }
+                    catch (ConnectionToServerException)
+                    {
+                        Ui.Current.LoginStatusText.text = "Can not connect to server";
+                    }
+                    catch (LoginException)
+                    {
+                        Ui.Current.LoginStatusText.text = "Wrong login or password";
+                    }
                 });
 
         }

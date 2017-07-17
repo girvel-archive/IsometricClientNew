@@ -7,7 +7,8 @@ using Assets.Code.Building;
 using Assets.Code.Common;
 using Assets.Code.Common.Helpers;
 using Assets.Code.Interface;
-using Isometric.Core;
+using Isometric.Core.Vectors;
+using Isometric.Dtos;
 using UnityEngine;
 
 namespace Assets.Code.Net
@@ -16,9 +17,15 @@ namespace Assets.Code.Net
     {
         private RequestProcessor _requestProcessor;
 
+        private NewsProcessor _newsProcessor;
+
         private Connection _connection;
-        
-        private readonly Encoding _encoding = Encoding.UTF8;
+
+        private string _lastLogin, _lastPassword;
+
+        private IPAddress _lastIpAddress;
+
+        private Vector _mainAreaPosition;
 
         public bool Runned { get; private set; }
 
@@ -26,44 +33,65 @@ namespace Assets.Code.Net
 
         public void Run(string login, string password, IPAddress ip)
         {
+            _lastLogin = login;
+            _lastPassword = password;
+            _lastIpAddress = ip;
+
             _connection = new Connection(new IPEndPoint(ip, 7999));
-            _connection.Start();
+
+            if (!_connection.TryStart())
+            {
+                throw new ConnectionToServerException();
+            }
 
             _requestProcessor = new RequestProcessor(_connection);
 
-            _requestProcessor.Request(
-                "login",
-                new Dictionary<string, object>
-                {
-                    {"login", login},
-                    {"password", password}
-                });
+            if (!TryLogin(login, password))
+            {
+                throw new LoginException();
+            }
 
             BuildingsManager.Current.ShowArea(GetArea());
 
-            GameUi.Current.ShowResources(GetResources());
-
             Runned = true;
-        }
 
-        private void Update()
-        {
-            if (Runned)
+            #region News
+
+            _newsProcessor = new NewsProcessor(new Dictionary<string, Action<NewsDto>>
             {
-                _resourcesRequestDelay -= Time.deltaTime;
-
-                if (_resourcesRequestDelay < 0)
                 {
-                    _resourcesRequestDelay += ResourcesRequestDelayDefault;
-                    GameUi.Current.ShowResources(GetResources());
-                }
-            }
+                    "army position changed", news =>
+                    {
+                        var oldPosition = (Vector) news.Info["old position"];
+
+                        if (!GetArmiesInfo(oldPosition).Any())
+                        {
+                            BuildingsManager.Current.RemoveArmy(oldPosition);
+                        }
+
+                        BuildingsManager.Current.SetArmy((Vector) news.Info["new position"]);
+                    }
+                },
+                {
+                    "army is appeared", news =>
+                    {
+                        BuildingsManager.Current.SetArmy((Vector) news.Info["position"]);
+                    }
+                },
+                {
+                    "hunger is changed", news =>
+                    {
+                        var indicator = BuildingsManager.Current[(Vector) news.Info["position"]].Indicator;
+                        
+                        indicator.Hunger = (bool) news.Info["hunger"];
+                    }
+                },
+            });
+
+            #endregion
         }
 
-        private const float ResourcesRequestDelayDefault = 1;
-        private float _resourcesRequestDelay = ResourcesRequestDelayDefault;
-
-        private void OnDestroy()
+        public void Stop()
         {
             if (_connection != null)
             {
@@ -71,18 +99,97 @@ namespace Assets.Code.Net
             }
         }
 
-
-
-        public MainBuildingInfo[,] GetArea()
+        private void Update()
         {
-            return ((Dictionary<string, object>[,]) _requestProcessor.Request("get area")["buildings"])
-                .TwoDimSelect(
-                    b => new MainBuildingInfo
+            if (Runned)
+            {
+                _refreshDelay -= Time.deltaTime;
+
+                if (_refreshDelay < 0)
+                {
+                    _refreshDelay += ResourcesRequestDelayDefault;
+                    GameUi.Current.ShowResources(GetResources());
+                    foreach (var news in GetNews())
                     {
-                        Name = (string) b["name"],
-                        BuildingTime = (TimeSpan) b["real building time"],
-                    });
+                        _newsProcessor.Process(news);
+                    }
+                }
+
+                if (!_connection.Connected)
+                {
+                    Runned = false;
+                    ActionProcessor.Current.AddActionToQueue(() =>
+                    {
+                        Stop();
+                        try
+                        {
+                            Run(_lastLogin, _lastPassword, _lastIpAddress);
+                            Runned = true;
+                            return true;
+                        }
+                        catch (LoginException)
+                        {
+                            return false;
+                        }
+                        catch (ConnectionToServerException)
+                        {
+                            return false;
+                        }
+                    }, 
+                    TimeSpan.FromSeconds(1));
+                }
+            }
         }
+
+        private const float ResourcesRequestDelayDefault = 1;
+        private float _refreshDelay = ResourcesRequestDelayDefault;
+
+        private void OnDestroy()
+        {
+            Stop();
+        }
+
+
+
+        #region Requests
+
+        #region Area, login, resources
+
+        public bool TryLogin(string login, string password)
+        {
+            return (bool) _requestProcessor.Request(
+                "login",
+                new Dictionary<string, object>
+                {
+                    {"login", login},
+                    {"password", password}
+                })["success"];
+        }
+
+        public Vector GetMainAreaPosition()
+        {
+            return (Vector)_requestProcessor.Request("get main area position")["position"];
+        }
+
+        public BuildingAreaDto[,] GetArea()
+        {
+            return (BuildingAreaDto[,])
+                _requestProcessor.Request(
+                    "get area",
+                    new Dictionary<string, object>
+                    {
+                        {"position", _mainAreaPosition = GetMainAreaPosition()}
+                    })["buildings"];
+        }
+
+        public float[] GetResources()
+        {
+            return (float[])_requestProcessor.Request("get resources")["resources"];
+        }
+
+        #endregion
+
+        #region Buildings
 
         public bool TryUpgrade(string upgradeName, Vector position, out TimeSpan time)
         {
@@ -91,16 +198,11 @@ namespace Assets.Code.Net
                 new Dictionary<string, object>
                 {
                     {"to", upgradeName},
-                    {"position", position},
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
                 });
 
             time = (TimeSpan) response["upgrade time"];
             return (bool)     response["success"];
-        }
-        
-        public float[] GetResources()
-        {
-            return (float[]) _requestProcessor.Request("get resources")["resources"];
         }
 
         public string[] GetUpgrades(Vector position)
@@ -109,9 +211,23 @@ namespace Assets.Code.Net
                 "get upgrades",
                 new Dictionary<string, object>
                 {
-                    {"position", position}
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
                 })["upgrades names"];
         }
+
+        public BuildingFullDto GetBuildingInfo(Vector position)
+        {
+            return (BuildingFullDto) _requestProcessor.Request(
+                "get building information",
+                new Dictionary<string, object>
+                {
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                })["data"];
+        }
+
+        #endregion
+        
+        #region People management
 
         public bool TryAddWorkers(Vector position, int delta)
         {
@@ -119,7 +235,7 @@ namespace Assets.Code.Net
                 "add workers",
                 new Dictionary<string, object>
                 {
-                    {"position", position},
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
                     {"delta", delta}
                 })["success"];
         }
@@ -130,57 +246,21 @@ namespace Assets.Code.Net
                 "add builders",
                 new Dictionary<string, object>
                 {
-                    {"position", position},
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
                     {"delta", delta}
                 })["success"];
         }
 
-        public int GetMaxWorkers(Vector position)
-        {
-            return (int) (long) _requestProcessor.Request(
-                "get max workers",
-                new Dictionary<string, object>
-                {
-                    {"position", position},
-                })["max workers"];
-        }
+        #endregion
 
-        public BuildingInfo GetBuildingInfo(Vector position)
-        {
-            var response = _requestProcessor.Request(
-                "get building information",
-                new Dictionary<string, object>
-                {
-                    {"position", position},
-                });
+        #region Researches
 
-            return new BuildingInfo
-            {
-                OwnerName = (string) response["owner name"],
-                Name = (string) response["name"],
-                People = (int) (long) response["people"],
-                Builders = (int) (long) response["builders"],
-                MaxBuilders = (int) (long) response["max builders"],
-                Workers = (int) (long) response["workers"],
-                MaxWorkers = (int) (long) response["max workers"],
-                Finished = (bool) response["finished"],
-                IsIncomeBuilding = (bool) response["is income building"],
-                IsWorkerBuilding = (bool) response["is worker building"],
-                Income = (float[]) response["income"],
-            };
-        }
-
-        public ResearchInfo[] GetNearestResearches(out string current)
+        public ResearchDto[] GetNearestResearches(out string current)
         {
             var response = _requestProcessor.Request("get nearest researches");
 
             current = (string) response["current"];
-            return ((Dictionary<string, object>[]) response["researches"]).Select(
-                r => new ResearchInfo
-                {
-                    Name = (string) r["name"],
-                    NewBuildings = (string[]) r["new buildings"],
-                }).ToArray();
+            return (ResearchDto[]) response["researches"];
         }
 
         public bool TryResearch(string researchName)
@@ -202,31 +282,68 @@ namespace Assets.Code.Net
             pointsPerMinute = (float) (double) response["points per minute"];
         }
 
+        #endregion
 
+        #region Armies
 
-        public class BuildingInfo
+        public ArmyDto[] GetArmiesInfo(Vector position)
         {
-            public string OwnerName, Name;
-
-            public int People, Builders, MaxBuilders, Workers, MaxWorkers;
-
-            public bool Finished, IsIncomeBuilding, IsWorkerBuilding;
-
-            public float[] Income;
+            return (ArmyDto[])
+                _requestProcessor.Request(
+                    "get armies info",
+                    new Dictionary<string, object>
+                    {
+                        {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    })["armies"];
         }
 
-        public class MainBuildingInfo
+        public void MoveArmy(Vector from, Vector to, int armyIndex)
         {
-            public string Name;
-
-            public TimeSpan BuildingTime;
+            _requestProcessor.Request(
+                "move army",
+                new Dictionary<string, object>
+                {
+                    {"position", new AbsolutePosition(_mainAreaPosition, from)},
+                    {"to", to},
+                    {"army index", armyIndex},
+                });
         }
 
-        public class ResearchInfo
+        public bool TrainArmy(Vector position, out TimeSpan trainingTime)
         {
-            public string Name;
+            var response = _requestProcessor.Request(
+                "train army",
+                new Dictionary<string, object>
+                {
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                });
 
-            public string[] NewBuildings;
+            trainingTime = (TimeSpan) response["training time"];
+            return (bool) response["success"];
         }
+
+        public TimeSpan LootBuilding(Vector position, int armyIndex)
+        {
+            return (TimeSpan) _requestProcessor.Request(
+                "loot building",
+                new Dictionary<string, object>
+                {
+                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"army index", armyIndex},
+                })["loot time"];
+        }
+
+        #endregion
+
+        #region News
+
+        public NewsDto[] GetNews()
+        {
+            return (NewsDto[]) _requestProcessor.Request("get news")["news"];
+        }
+
+        #endregion
+
+        #endregion
     }
 }

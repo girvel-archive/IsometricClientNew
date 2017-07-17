@@ -1,4 +1,4 @@
-﻿using Isometric.Core;
+﻿using Isometric.Core.Vectors;
 using UnityEngine;
 
 namespace Assets.Code.Building
@@ -7,13 +7,15 @@ namespace Assets.Code.Building
     {
         public GameObject Building { get; set; }
 
+        public GameObject Army { get; set; }
+
         public GameObject Holder { get; set; }
 
         public Vector Position { get; set; }
 
         public string Name { get; set; }
 
-        public Timer Timer { get; set; }
+        public Indicator Indicator { get; set; }
 
 
 

@@ -15,6 +15,8 @@ namespace Assets.Code.Interface
             LoginForm, 
             GameUiForm; 
 
-        public Text ResourcesText;
+        public Text 
+            ResourcesText,
+            LoginStatusText;
     }
 }

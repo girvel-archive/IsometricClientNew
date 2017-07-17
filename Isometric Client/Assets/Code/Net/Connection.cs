@@ -11,6 +11,11 @@ namespace Assets.Code.Net
     {
         public IPEndPoint ServerEndPoint { get; set; }
 
+        public bool Connected
+        {
+            get { return _socket.Connected; }
+        }
+
         private Socket _socket;
 
         private readonly Encoding _encoding = Encoding.UTF8;
@@ -24,10 +29,20 @@ namespace Assets.Code.Net
 
 
 
-        public void Start()
+        public bool TryStart()
         {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            _socket.Connect(ServerEndPoint);
+
+            try
+            {
+                _socket.Connect(ServerEndPoint);
+            }
+            catch (SocketException)
+            {
+                return false;
+            }
+
+            return true;
         }
         
         public string Request(string request)

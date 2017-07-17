@@ -15,27 +15,50 @@ namespace Assets.Code.Common
             Number0,
             Number1,
             Instruments,
-            Agriculture;
+            Agriculture,
+            Army,
+            ArmyForest,
+            ArmyHouse,
+            Right,
+            Left,
+            Move,
+            Attack,
+            DestroyBuilding;
 
 
 
-        private Dictionary<string, Sprite> _spritesByNames;
+        private Dictionary<string, Sprite> 
+            _spritesByNames,
+            _armiesForBuildings;
 
 
         protected override void Start()
         {
             base.Start();
+
             _spritesByNames = new Dictionary<string, Sprite>
             {
                 {"Орудия труда", Instruments},
                 {"Земледелие", Agriculture},
             };
+
+            _armiesForBuildings = new Dictionary<string, Sprite>
+            {
+                {"Forest", ArmyForest},
+                {"House", ArmyHouse},
+            };
         }
 
 
-        public Sprite GetResearchSprite(string name)
+        public Sprite GetByName(string name)
         {
             return _spritesByNames[name];
+        }
+
+        public Sprite GetArmySpriteForBuilding(string buildingName)
+        {
+            Sprite result;
+            return _armiesForBuildings.TryGetValue(buildingName, out result) ? result : Army;
         }
     }
 }

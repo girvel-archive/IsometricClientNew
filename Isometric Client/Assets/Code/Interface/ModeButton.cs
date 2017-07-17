@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Assets.Code.Interface
 {
-    public class ModeButton : HotkeyButton
+    public class ModeButton : GameUiButton
     {
         public UiMode Mode;
 

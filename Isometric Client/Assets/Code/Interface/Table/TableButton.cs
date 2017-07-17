@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Assets.Code.Interface.Table
 {
-    public class TableButton : HotkeyButton, IPointerEnterHandler, IPointerExitHandler
+    public class TableButton : GameUiButton, IPointerEnterHandler, IPointerExitHandler
     {
         public Action<TableButton> Click = b => { };
 
@@ -16,22 +16,8 @@ namespace Assets.Code.Interface.Table
             set { GetComponent<Image>().sprite = value; }
         }
 
-        public string Description { get; set; }
-
         public Text InformationText;
 
-        private bool _isMouseOver;
-
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (_isMouseOver)
-            {
-                InformationPanel.Current.Text = Description + "\n";
-            }
-        }
 
         protected override void OnHotkeyPress()
         {
@@ -41,29 +27,14 @@ namespace Assets.Code.Interface.Table
 
         public void OnClick()
         {
+            GameUi.Current.SelectingTargetMode = false;
+            Debug.Log(GameUi.Current.SelectingTargetMode);
+
+            GameUi.Current.Refresh();
+
             if (Click != null)
             {
                 Click(this);
-            }
-
-            GameUi.Current.RefreshTable();
-        }
-        
-        public void OnPointerEnter(PointerEventData data)
-        {
-            _isMouseOver = true;
-        }
-
-        public void OnPointerExit(PointerEventData data)
-        {
-            _isMouseOver = false;
-            if (BuildingsManager.Current.SelectedBuilding == null)
-            {
-                InformationPanel.Current.Text = "";
-            }
-            else
-            {
-                GameUi.Current.RefreshTable();
             }
         }
 

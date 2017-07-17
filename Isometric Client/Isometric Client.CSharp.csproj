@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.5.2f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -75,8 +73,11 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="Isometric.Core">
-      <HintPath>Assets\Dlls\Isometric.Core.dll</HintPath>
+    <Reference Include="Isometric.Core.Vectors">
+      <HintPath>Assets\Dlls\Isometric.Core.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="Isometric.Dtos">
+      <HintPath>Assets\Dlls\Isometric.Dtos.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Dlls\Newtonsoft.Json.dll</HintPath>
@@ -86,9 +87,12 @@
     <Compile Include="Assets\Code\Building\BuildingImage.cs" />
     <Compile Include="Assets\Code\Building\BuildingsManager.cs" />
     <Compile Include="Assets\Code\Building\HolderController.cs" />
+    <Compile Include="Assets\Code\Building\IIndicatorManager.cs" />
+    <Compile Include="Assets\Code\Building\Indicator.cs" />
     <Compile Include="Assets\Code\Building\IsometricController.cs" />
     <Compile Include="Assets\Code\Building\Timer.cs" />
     <Compile Include="Assets\Code\Common\ActionProcessor.cs" />
+    <Compile Include="Assets\Code\Common\GameObjects.cs" />
     <Compile Include="Assets\Code\Common\Helpers\ArrayHelper.cs" />
     <Compile Include="Assets\Code\Common\Helpers\ResourcesHelper.cs" />
     <Compile Include="Assets\Code\Common\Helpers\StringHelper.cs" />
@@ -98,18 +102,26 @@
     <Compile Include="Assets\Code\Common\Prefabs.cs" />
     <Compile Include="Assets\Code\Common\SingletonBehaviour.cs" />
     <Compile Include="Assets\Code\Common\Sprites.cs" />
+    <Compile Include="Assets\Code\Common\TimeSpanHelper.cs" />
     <Compile Include="Assets\Code\Input\CameraController.cs" />
     <Compile Include="Assets\Code\Interface\GameUi.cs" />
-    <Compile Include="Assets\Code\Interface\HotkeyButton.cs" />
+    <Compile Include="Assets\Code\Interface\GameUiButton.cs" />
     <Compile Include="Assets\Code\Interface\InformationPanel.cs" />
     <Compile Include="Assets\Code\Interface\LoginButton.cs" />
     <Compile Include="Assets\Code\Interface\ModeButton.cs" />
+    <Compile Include="Assets\Code\Interface\Modes\ArmyUi.cs" />
+    <Compile Include="Assets\Code\Interface\Modes\BuildingUi.cs" />
+    <Compile Include="Assets\Code\Interface\Modes\IModeUi.cs" />
+    <Compile Include="Assets\Code\Interface\Modes\ResearchUi.cs" />
     <Compile Include="Assets\Code\Interface\Table\TableButton.cs" />
     <Compile Include="Assets\Code\Interface\Table\TableManager.cs" />
     <Compile Include="Assets\Code\Interface\Ui.cs" />
     <Compile Include="Assets\Code\Interface\UiMode.cs" />
     <Compile Include="Assets\Code\Net\Connection.cs" />
+    <Compile Include="Assets\Code\Net\ConnectionToServerException.cs" />
+    <Compile Include="Assets\Code\Net\LoginException.cs" />
     <Compile Include="Assets\Code\Net\NetManager.cs" />
+    <Compile Include="Assets\Code\Net\NewsProcessor.cs" />
     <Compile Include="Assets\Code\Net\PermissionDeniedException.cs" />
     <Compile Include="Assets\Code\Net\RequestProcessor.cs" />
     <Compile Include="Assets\Code\Net\Serializer.cs" />

@@ -1,4 +1,4 @@
-﻿using Isometric.Core;
+﻿using Isometric.Core.Vectors;
 using UnityEngine;
 
 namespace Assets.Code.Common.Helpers
