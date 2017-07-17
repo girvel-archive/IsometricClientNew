@@ -13,7 +13,8 @@ namespace Assets.Code.Interface
 
         public GameObject 
             LoginForm, 
-            GameUiForm; 
+            GameUiForm,
+            TipForm; 
 
         public Text 
             ResourcesText,

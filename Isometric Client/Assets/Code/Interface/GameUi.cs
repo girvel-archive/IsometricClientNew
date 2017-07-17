@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Assets.Code.Common.Helpers;
 using Assets.Code.Interface.Modes;
+using Assets.Code.Interface.Panels;
 
 namespace Assets.Code.Interface
 {
@@ -64,7 +65,8 @@ namespace Assets.Code.Interface
         {
             Ui.Current.ResourcesText.text =
                 string.Format(
-                    "Wood: {0}\nFood: {1}",
+                    "Дерево: {0}\n" +
+                    "Еда: {1}",
                     resources.Select(r => (object)((int)r).ToString()).ToArray());
         }
         
@@ -114,8 +116,6 @@ namespace Assets.Code.Interface
 
         public void Clear()
         {
-            Debug.Log(SelectingTargetMode);
-            
             InformationPanel.Current.Text = "";
             TableManager.Current.Clear();
 

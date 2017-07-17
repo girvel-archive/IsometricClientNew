@@ -2,6 +2,7 @@
 using System.Linq;
 using Assets.Code.Common;
 using Assets.Code.Common.Helpers;
+using Assets.Code.Interface.Panels;
 using Assets.Code.Interface.Table;
 using Assets.Code.Net;
 using Isometric.Core.Vectors;
