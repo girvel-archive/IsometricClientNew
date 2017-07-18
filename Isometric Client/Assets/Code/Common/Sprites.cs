@@ -12,8 +12,6 @@ namespace Assets.Code.Common
             UpgradeIcon,
             IncrementWorkers,
             DecrementWorkers,
-            Number0,
-            Number1,
             Instruments,
             Agriculture,
             Army,
@@ -23,7 +21,10 @@ namespace Assets.Code.Common
             Left,
             Move,
             Attack,
-            DestroyBuilding;
+            DestroyBuilding,
+            FlagPlayer,
+            FlagNeutral,
+            FlagEnemy;
 
 
 

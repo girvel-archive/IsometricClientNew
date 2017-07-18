@@ -12,7 +12,8 @@ namespace Assets.Code.Common
             House,
             BuildingTimer,
             TableButton, 
-            Army;
+            Army,
+            Flag;
 
 
 

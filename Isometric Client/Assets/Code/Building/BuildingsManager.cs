@@ -46,24 +46,27 @@ namespace Assets.Code.Building
             }
         }
 
-        public void SetBuilding(Vector position, string buildingName)
+        public void SetBuilding(Vector position, string buildingName, string ownerName)
         {
             if (Buildings == null)
             {
                 throw new NullReferenceException("Call ShowArea() before SetBuilding()");
             }
 
-            var oldBuilding = Buildings[position.X, position.Y].Building;
+            var image = Buildings[position.X, position.Y];
 
-            var newBuilding 
-                = Buildings[position.X, position.Y].Building 
+            var oldBuilding = image.Building;
+
+            image.Building 
                 = Instantiate(
                     Prefabs.Current.GetPrefab(buildingName), 
                     GameObjects.Current.BuildingsContainer.transform);
             
-            newBuilding
+            image.Building
                 .GetComponent<IsometricController>()
                 .IsometricPosition = position.ToVector2();
+
+            RefreshFlag(buildingName, ownerName, image.Flag);
 
             if (oldBuilding != null)
             {
@@ -71,22 +74,22 @@ namespace Assets.Code.Building
 
                 foreach (var child in oldBuilding.GetComponentsInChildren<Transform>())
                 {
-                    child.SetParent(newBuilding.transform, false);
+                    child.SetParent(image.Building.transform, false);
                 }
 
-                if (Buildings[position.X, position.Y].Army != null)
+                if (image.Army != null)
                 {
-                    Buildings[position.X, position.Y].Army.GetComponent<SpriteRenderer>().sprite =
+                    image.Army.GetComponent<SpriteRenderer>().sprite =
                         Sprites.Current.GetArmySpriteForBuilding(buildingName);
                 }
             }
         }
 
-        public void SetUpgrade(Vector position, string buildingName, TimeSpan time)
+        public void SetUpgrade(Vector position, string buildingName, string ownerName, TimeSpan time)
         {
             var image = Buildings[position.X, position.Y];
 
-            SetBuilding(position, buildingName);
+            SetBuilding(position, buildingName, ownerName);
 
             SetTimer(position, time);
             image.Name = buildingName;
@@ -150,14 +153,22 @@ namespace Assets.Code.Building
                         Name = b.Name,
                     };
 
-                    SetBuilding(new Vector(x, y), b.Name);
+                    image.Flag = Instantiate(
+                        Prefabs.Current.Flag,
+                        Vector3.zero,
+                        new Quaternion())
+                        .GetComponent<SpriteRenderer>();
+
+                    SetBuilding(new Vector(x, y), b.Name, b.OwnerName);
+
+                    image.Flag.transform.SetParent(image.Building.transform, false);
 
                     image.Indicator =
                         Instantiate(
                             Prefabs.Current.BuildingTimer,
-                            Buildings[x, y].Building.transform.position + new Vector3(0, -0.75f, -1),
+                            image.Building.transform.position + new Vector3(0, -0.75f, -1),
                             new Quaternion(),
-                            Buildings[x, y].Building.transform)
+                            image.Building.transform)
                             .GetComponent<Indicator>();
 
                     if (b.BuildingTime > TimeSpan.Zero)
@@ -201,6 +212,36 @@ namespace Assets.Code.Building
                 GameUi.Current.SelectingTargetMode = false;
                 GameUi.Current.Clear();
             }
+        }
+
+
+
+        private readonly string[] _buildingsWithoutFlag =
+        {
+            "Plain",
+            "Forest",
+        };
+
+        private void RefreshFlag(string buildingName, string ownerName, SpriteRenderer flag)
+        {
+            Sprite flagSprite = null;
+            if (!_buildingsWithoutFlag.Contains(buildingName))
+            {
+                if (ownerName == NetManager.Current.LastLogin)
+                {
+                    flagSprite = Sprites.Current.FlagPlayer;
+                }
+                else if (ownerName == "no owner")
+                {
+                    flagSprite = Sprites.Current.FlagNeutral;
+                }
+                else
+                {
+                    flagSprite = Sprites.Current.FlagEnemy;
+                }
+            }
+            
+            flag.sprite = flagSprite;
         }
     }
 }

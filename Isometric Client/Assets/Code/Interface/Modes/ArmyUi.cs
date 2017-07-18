@@ -119,6 +119,7 @@ namespace Assets.Code.Interface.Modes
                         BuildingsManager.Current.SetUpgrade(
                             _lastPosition, 
                             "Plain", 
+                            "no owner",
                             NetManager.Current.LootBuilding(_lastPosition, _currentArmyIndex));
                     },
                     "Уничтожить здание");

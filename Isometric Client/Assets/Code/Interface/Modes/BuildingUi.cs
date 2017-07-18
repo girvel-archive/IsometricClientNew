@@ -88,7 +88,7 @@ namespace Assets.Code.Interface.Modes
                         TimeSpan upgradeTime;
                         if (NetManager.Current.TryUpgrade(upgrade, _lastPosition, out upgradeTime))
                         {
-                            BuildingsManager.Current.SetUpgrade(_lastPosition, upgrade, upgradeTime);
+                            BuildingsManager.Current.SetUpgrade(_lastPosition, upgrade, NetManager.Current.LastLogin, upgradeTime);
                         }
 
                         ActionProcessor.Current.AddActionToQueue(

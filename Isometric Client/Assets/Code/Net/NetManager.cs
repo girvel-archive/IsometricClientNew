@@ -21,7 +21,7 @@ namespace Assets.Code.Net
 
         private Connection _connection;
 
-        private string _lastLogin, _lastPassword;
+        public string LastLogin, LastPassword;
 
         private IPAddress _lastIpAddress;
 
@@ -33,8 +33,8 @@ namespace Assets.Code.Net
 
         public void Run(string login, string password, IPAddress ip)
         {
-            _lastLogin = login;
-            _lastPassword = password;
+            LastLogin = login;
+            LastPassword = password;
             _lastIpAddress = ip;
 
             _connection = new Connection(new IPEndPoint(ip, 7999));
@@ -123,7 +123,7 @@ namespace Assets.Code.Net
                         Stop();
                         try
                         {
-                            Run(_lastLogin, _lastPassword, _lastIpAddress);
+                            Run(LastLogin, LastPassword, _lastIpAddress);
                             Runned = true;
                             return true;
                         }
