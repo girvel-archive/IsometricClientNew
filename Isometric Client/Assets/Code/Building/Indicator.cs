@@ -39,7 +39,6 @@ namespace Assets.Code.Building
         {
             if (Manager != null)
             {
-                Debug.Log("Update");
                 Manager.Update(this, TimeSpan.FromSeconds(Time.deltaTime));
             }
         }

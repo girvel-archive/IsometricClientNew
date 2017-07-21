@@ -304,7 +304,7 @@ namespace Assets.Code.Net
                 new Dictionary<string, object>
                 {
                     {"position", new AbsolutePosition(_mainAreaPosition, from)},
-                    {"to", to},
+                    {"to", new AbsolutePosition(_mainAreaPosition, to)},
                     {"army index", armyIndex},
                 });
         }

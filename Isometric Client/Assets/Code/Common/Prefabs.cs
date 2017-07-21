@@ -27,11 +27,11 @@ namespace Assets.Code.Common
                 case "Forest":
                     return Forest;
 
-                case "House":
+                default:
                     return House;
 
-                default:
-                    throw new NotImplementedException();
+                //default:
+                //    throw new NotImplementedException();
             }
         }
     }
