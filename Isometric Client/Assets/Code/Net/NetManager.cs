@@ -135,7 +135,7 @@ namespace Assets.Code.Net
                         {
                             return false;
                         }
-                    }, 
+                    },
                     TimeSpan.FromSeconds(1));
                 }
             }
