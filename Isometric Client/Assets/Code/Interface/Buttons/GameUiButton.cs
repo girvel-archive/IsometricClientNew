@@ -1,12 +1,11 @@
 ﻿using System;
-using Assets.Code.Building;
+using System.Collections.Generic;
 using Assets.Code.Interface.Panels;
-using Assets.Code.Interface.Table;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Assets.Code.Interface
+namespace Assets.Code.Interface.Buttons
 {
     public abstract class GameUiButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
@@ -18,7 +17,13 @@ namespace Assets.Code.Interface
             
         public KeyCode Hotkey
         {
-            get { return (KeyCode) Enum.Parse(typeof (KeyCode), HotkeyText.text); }
+            get
+            {
+                KeyCode result;
+                return HotkeyToKeyCode.TryGetValue(HotkeyText.text, out result) 
+                    ? result 
+                    : (KeyCode) Enum.Parse(typeof (KeyCode), HotkeyText.text);
+            }
             set { HotkeyText.text = value.ToString(); }
         }
 
@@ -49,7 +54,23 @@ namespace Assets.Code.Interface
         public void OnPointerExit(PointerEventData data)
         {
             _isMouseOver = false;
-            GameUi.Current.ReselectLastCell();
+            GameUi.Current.ShowPreviousData();
         }
+
+
+
+        private static readonly Dictionary<string, KeyCode> HotkeyToKeyCode = new Dictionary<string, KeyCode>
+        {
+            {"0", KeyCode.Alpha0},
+            {"1", KeyCode.Alpha1},
+            {"2", KeyCode.Alpha2},
+            {"3", KeyCode.Alpha3},
+            {"4", KeyCode.Alpha4},
+            {"5", KeyCode.Alpha5},
+            {"6", KeyCode.Alpha6},
+            {"7", KeyCode.Alpha7},
+            {"8", KeyCode.Alpha8},
+            {"9", KeyCode.Alpha9},
+        };
     }
 }

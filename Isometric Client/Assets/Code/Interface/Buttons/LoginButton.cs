@@ -1,9 +1,10 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using Assets.Code.Common;
 using Assets.Code.Net;
 using UnityEngine;
 
-namespace Assets.Code.Interface
+namespace Assets.Code.Interface.Buttons
 {
     public class LoginButton : MonoBehaviour
     {
@@ -14,10 +15,14 @@ namespace Assets.Code.Interface
                 {
                     try
                     {
+                        IPAddress ip;
+
                         NetManager.Current.Run(
                             Ui.Current.LoginInputField.text,
                             Ui.Current.PasswordInputField.text,
-                            IPAddress.Parse(Ui.Current.IpInputField.text));
+                            IPAddress.TryParse(Ui.Current.IpInputField.text, out ip)
+                                ? ip
+                                : Dns.GetHostAddresses(Ui.Current.IpInputField.text).First());
 
                         Ui.Current.GameUiForm.SetActive(true);
                         Ui.Current.LoginForm.SetActive(false);

@@ -38,14 +38,18 @@ namespace Assets.Code.Building
 
         public void End(Indicator indicator)
         {
-            ActionProcessor.Current.AddActionToQueue(
-                () =>
-                {
-                    GameUi.Current.Refresh();
-                },
-                TimeSpan.FromSeconds(1));
+            if (GameUi.Current.Mode == UiMode.Management
+                || (BuildingsManager.Current.SelectedBuilding != null
+                    && BuildingsManager.Current.SelectedBuilding.Indicator == indicator))
+            {
+                ActionProcessor.Current.AddActionToQueue(
+                    () =>
+                    {
+                        GameUi.Current.Refresh();
+                    },
+                    TimeSpan.FromSeconds(1));
+            }
 
-            Debug.Log("end");
             indicator.Manager = null;
             indicator.Text = "";
         }

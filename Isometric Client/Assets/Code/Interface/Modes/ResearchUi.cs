@@ -28,9 +28,11 @@ namespace Assets.Code.Interface.Modes
             ShowResearches();
         }
 
-        public void SelectCell(Vector position)
+        public bool SelectCell(Vector position)
         {
             HighlightCell(position);
+
+            return true;
         }
 
         public void HighlightCell(Vector position)
@@ -115,7 +117,7 @@ namespace Assets.Code.Interface.Modes
                 TableManager.Current.SetButton(
                     i % 5,
                     i / 5,
-                    Sprites.Current.GetByName(research.Name),
+                    Sprites.Current.GetIcon(research.Name),
                     b =>
                     {
                         if (NetManager.Current.TryResearch(research.Name))

@@ -34,7 +34,7 @@ namespace Assets.Code.Building
         {
             if (IsometricPosition != LastIsometricPosition)
             {
-                GetComponent<SpriteRenderer>().sortingOrder = -(int)(IsometricPosition.x + IsometricPosition.y);
+                GetComponent<SpriteRenderer>().sortingOrder = -2 * (int)(IsometricPosition.x + IsometricPosition.y);
 
                 LastIsometricPosition = IsometricPosition;
             }

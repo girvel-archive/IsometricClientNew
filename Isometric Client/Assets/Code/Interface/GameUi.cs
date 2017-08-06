@@ -10,18 +10,38 @@ using Isometric.Core.Vectors;
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.Code.Common.Helpers;
+using Assets.Code.Interface.Buttons;
 using Assets.Code.Interface.Modes;
 using Assets.Code.Interface.Panels;
+using Isometric.Dtos;
 
 namespace Assets.Code.Interface
 {
     public class GameUi : SingletonBehaviour<GameUi>
     {
+        private bool _selectingTargetMode;
+        private UiMode _mode;
+
+
+
         public Dictionary<UiMode, IModeUi> ModeUis { get; set; }
 
-        public bool SelectingTargetMode { get; set; }
+        public bool SelectingTargetMode
+        {
+            get { return _selectingTargetMode; }
+            set
+            {
+                _selectingTargetMode = value;
+                if (_selectingTargetMode)
+                {
+                    InformationPanel.Current.Text = "Выберите цель";
+                }
+            }
+        }
 
         public Action<Vector> SelectingTargetAction;
+
+        private TimeSpan _currentMessageTime;
 
 
 
@@ -35,7 +55,6 @@ namespace Assets.Code.Interface
                 ModeButtons[(int) Mode].SetActiveFrame(true);
             }
         }
-        private UiMode _mode;
 
         public ModeButton[] ModeButtons;
 
@@ -51,27 +70,52 @@ namespace Assets.Code.Interface
                 {UiMode.Building, new BuildingUi()},
                 {UiMode.Research, new ResearchUi()},
                 {UiMode.Army, new ArmyUi()},
+                {UiMode.Management, new ManagementUi()},
             };
         }
 
         private void Update()
         {
-            ModeUis[Mode].Update(TimeSpan.FromSeconds(Time.deltaTime));
+            var deltaTime = TimeSpan.FromSeconds(Time.deltaTime);
+            if (_currentMessageTime > TimeSpan.Zero)
+            {
+                _currentMessageTime -= deltaTime;
+
+                if (_currentMessageTime <= TimeSpan.Zero)
+                {
+                    ShowPreviousData();
+                }
+            }
+
+            ModeUis[Mode].Update(deltaTime);
         }
 
 
 
-        public void ShowResources(float[] resources)
+        public void ShowMessage(string message, TimeSpan time)
         {
+            _currentMessageTime = time;
+            InformationPanel.Current.Text = message;
+        }
+
+        public void ShowResources(ResourcesDto resources)
+        {
+            var i = 2;
             Ui.Current.ResourcesText.text =
                 string.Format(
-                    "Дерево: {0}\n" +
-                    "Еда: {1}",
-                    resources.Select(r => (object)((int)r).ToString()).ToArray());
+                    "Свободные люди: {0}/{1}\n"
+                    + Names.ResourcesNames.Aggregate("", (sum, r) => sum + r + ": {" + i++ + "}\n"),
+                    new object[]
+                    {
+                        resources.FreePeople,
+                        resources.MaxPeople,
+                    }.Concat(
+                        resources.ResourcesArray.Select(r => (object) ((int) r).ToString())).ToArray());
         }
         
         public void SetMode(UiMode mode)
         {
+            Clear();
             Mode = mode;
             Refresh();
         }
@@ -90,28 +134,35 @@ namespace Assets.Code.Interface
             ModeUis[Mode].Refresh();
         }
 
-        public void SelectCell(Vector position)
+        public bool SelectCell(Vector position)
         {
             if (SelectingTargetMode)
             {
                 Debug.Log("Target selected");
                 SelectingTargetAction(position);
                 SelectingTargetMode = false;
+                return false;
             }
             else
             {
-                ModeUis[Mode].SelectCell(position);
+                return ModeUis[Mode].SelectCell(position);
             }
         }
 
         public void HighlightCell(Vector position)
         {
-            ModeUis[Mode].HighlightCell(position);
+            if (!_selectingTargetMode)
+            {
+                ModeUis[Mode].HighlightCell(position);
+            }
         }
 
-        public void ReselectLastCell()
+        public void ShowPreviousData()
         {
-            ModeUis[Mode].ShowPreviousData();
+            if (!_selectingTargetMode)
+            {
+                ModeUis[Mode].ShowPreviousData();
+            }
         }
 
         public void Clear()

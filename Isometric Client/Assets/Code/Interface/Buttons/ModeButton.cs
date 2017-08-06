@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
-namespace Assets.Code.Interface
+namespace Assets.Code.Interface.Buttons
 {
     public class ModeButton : GameUiButton
     {

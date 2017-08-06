@@ -4,6 +4,7 @@ using Assets.Code.Common.Helpers;
 using Assets.Code.Interface;
 using Assets.Code.Net;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Assets.Code.Building
 {
@@ -11,12 +12,19 @@ namespace Assets.Code.Building
     {
         private void OnMouseDown()
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             var position = 
                 GetComponent<IsometricController>().IsometricPosition
                 .ToIsometricVector();
 
-            BuildingsManager.Current.SelectBuilding(position);
-            GameUi.Current.SelectCell(position);
+            if (GameUi.Current.SelectCell(position))
+            {
+                BuildingsManager.Current.SelectBuilding(position);
+            }
         }
 
         private void OnMouseEnter()
@@ -41,7 +49,7 @@ namespace Assets.Code.Building
                 GetComponent<SpriteRenderer>().sprite = Sprites.Current.UsualPlain;
             }
 
-            GameUi.Current.ReselectLastCell();
+            GameUi.Current.ShowPreviousData();
         }
     }
 }

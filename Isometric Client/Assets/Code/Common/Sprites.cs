@@ -28,20 +28,12 @@ namespace Assets.Code.Common
 
 
 
-        private Dictionary<string, Sprite> 
-            _spritesByNames,
-            _armiesForBuildings;
+        private Dictionary<string, Sprite> _armiesForBuildings;
 
 
         protected override void Start()
         {
             base.Start();
-
-            _spritesByNames = new Dictionary<string, Sprite>
-            {
-                {"Орудия труда", Instruments},
-                {"Земледелие", Agriculture},
-            };
 
             _armiesForBuildings = new Dictionary<string, Sprite>
             {
@@ -51,15 +43,19 @@ namespace Assets.Code.Common
         }
 
 
-        public Sprite GetByName(string name)
+        public Sprite GetBuilding(string buildingName)
         {
-            return _spritesByNames[name];
+            return Resources.Load<Sprite>("Buildings/" + buildingName);
+        }
+
+        public Sprite GetIcon(string iconName)
+        {
+            return Resources.Load<Sprite>("Icons/" + iconName);
         }
 
         public Sprite GetArmySpriteForBuilding(string buildingName)
         {
-            Sprite result;
-            return _armiesForBuildings.TryGetValue(buildingName, out result) ? result : Army;
+            return Resources.Load<Sprite>("Armies/" + buildingName) ?? Army;
         }
     }
 }

@@ -5,5 +5,6 @@
         Building,
         Research,
         Army,
+        Management,
     }
 }

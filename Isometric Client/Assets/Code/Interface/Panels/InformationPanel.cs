@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Assets.Code.Common;
 using Assets.Code.Common.Helpers;
 using Assets.Code.Interface.Table;
 using Isometric.Dtos;
@@ -13,16 +15,20 @@ namespace Assets.Code.Interface.Panels
                 string.Format(
                     "{0}\n" +
                     (info.OwnerName == "no owner" ? "Без владельца\n" : "Владелец: '{1}'\n") +
-                    (info.IsFinished ? "" : "Строители: " + info.Builders + "/" + info.MaxBuilders + "\n") +
+                    (info.IsFinished ? "" : "Не достроено\nСтроители: " + info.Builders + "/" + info.MaxBuilders + "\n") +
                     "\nНезанятых людей: {2}",
-                    info.Name,
+                    Names.RealBuildingsNames[info.Name],
                     info.OwnerName,
                     info.FreePeople)
                 + (info.IsIncomeBuilding || info.IsWorkerBuilding ? "\n" : "")
                 + (info.IsIncomeBuilding
-                    ? string.Format(
-                        "\nДоход: {0}",
-                        info.Income.ToResourcesString())
+                    ? (info.Income.Where((t, i) => t != info.LastIncome[i]).Any() // if income is not maximal
+                        ? string.Format( 
+                            "\nМаксимальный доход: {0}"
+                            + "\nТекущий доход: {1}",
+                            info.Income.ToResourcesString(),
+                            info.LastIncome.ToResourcesString())
+                        : "\nДоход:" + info.Income.ToResourcesString())
                     : "")
                 + (info.IsWorkerBuilding
                     ? string.Format(
@@ -58,7 +64,7 @@ namespace Assets.Code.Interface.Panels
                         + ",\n"
                         + string.Format(
                             "{0} ({1}, {2})",
-                            army.Name,
+                            Names.RealArmiesNames[army.Name],
                             army.Owner,
                             army.LifePoints))
                     .Substring(2)
@@ -79,16 +85,18 @@ namespace Assets.Code.Interface.Panels
                         info.BonusDamage > 0 ? "+" : "-",
                         info.BonusDamage,
                         ArmorTypes1[info.BonusArmorType]))
-                + "\nВладелец: '{3}'",
-                info.Name,
+                + "\nВладелец: '{3}'" 
+                + "\n{4}",
+                Names.RealArmiesNames[info.Name],
                 info.LifePoints,
                 info.Damage,
-                info.Owner);
+                info.Owner,
+                Tasks[info.Task]);
         }
 
 
 
-        private readonly string[] ArmorTypes =
+        private static readonly string[] ArmorTypes =
         {
             "Без брони",
             "Здание",
@@ -97,7 +105,7 @@ namespace Assets.Code.Interface.Panels
             "Тяжелая броня",
         };
 
-        private readonly string[] ArmorTypes1 =
+        private static readonly string[] ArmorTypes1 =
         {
             "юнитам без брони",
             "зданиям",
@@ -105,5 +113,12 @@ namespace Assets.Code.Interface.Panels
             "юнитам с средней броней",
             "юнитам с тяжелой броней",
         };
+
+        private static readonly Dictionary<string, string> Tasks = new Dictionary<string, string>
+        {
+            {"DestroyingTask", "Разрушает здание"},
+            {"MovingTask", "Двигается"},
+            {"", ""},
+        };  
     }
 }

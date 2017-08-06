@@ -60,16 +60,22 @@ namespace Assets.Code.Net
             _newsProcessor = new NewsProcessor(new Dictionary<string, Action<NewsDto>>
             {
                 {
-                    "army position changed", news =>
+                    "army position is changed", news =>
                     {
                         var oldPosition = (Vector) news.Info["old position"];
+                        var newPosition = (Vector) news.Info["new position"];
 
                         if (!GetArmiesInfo(oldPosition).Any())
                         {
                             BuildingsManager.Current.RemoveArmy(oldPosition);
                         }
 
-                        BuildingsManager.Current.SetArmy((Vector) news.Info["new position"]);
+                        BuildingsManager.Current.SetArmy(newPosition);
+
+                        if (new[] {newPosition, oldPosition}.Any(p => p == BuildingsManager.Current.SelectedBuilding.Position))
+                        {
+                            ActionProcessor.Current.AddActionToQueue(() => GameUi.Current.Refresh(), TimeSpan.FromSeconds(0.25));
+                        }
                     }
                 },
                 {
@@ -84,6 +90,22 @@ namespace Assets.Code.Net
                         var indicator = BuildingsManager.Current[(Vector) news.Info["position"]].Indicator;
                         
                         indicator.Hunger = (bool) news.Info["hunger"];
+                    }
+                },
+                {
+                    "building is destroyed", news =>
+                    {
+                        BuildingsManager.Current.SetBuilding((Vector) news.Info["position"], "Plain", "no owner");
+                        GameUi.Current.Refresh();
+                    }
+                },
+                {
+                    "army task is finished", news =>
+                    {
+                        if (BuildingsManager.Current.SelectedBuilding.Position == (Vector) news.Info["position"])
+                        {
+                            GameUi.Current.Refresh();
+                        }
                     }
                 },
             });
@@ -182,9 +204,9 @@ namespace Assets.Code.Net
                     })["buildings"];
         }
 
-        public float[] GetResources()
+        public ResourcesDto GetResources()
         {
-            return (float[])_requestProcessor.Request("get resources")["resources"];
+            return (ResourcesDto)_requestProcessor.Request("get resources")["resources"];
         }
 
         #endregion
@@ -205,14 +227,14 @@ namespace Assets.Code.Net
             return (bool)     response["success"];
         }
 
-        public string[] GetUpgrades(Vector position)
+        public UpgradeDto[] GetUpgrades(Vector position)
         {
-            return (string[]) _requestProcessor.Request(
+            return (UpgradeDto[]) _requestProcessor.Request(
                 "get upgrades",
                 new Dictionary<string, object>
                 {
                     {"position", new AbsolutePosition(_mainAreaPosition, position)},
-                })["upgrades names"];
+                })["upgrades"];
         }
 
         public BuildingFullDto GetBuildingInfo(Vector position)
@@ -249,6 +271,22 @@ namespace Assets.Code.Net
                     {"position", new AbsolutePosition(_mainAreaPosition, position)},
                     {"delta", delta}
                 })["success"];
+        }
+
+        public IncomeBuildingDto[] GetAllIncomeBuildings()
+        {
+            return (IncomeBuildingDto[]) _requestProcessor.Request("get all income buildings")["buildings"];
+        }
+
+        public int AddWorkersForPrototype(string prototypeName, int delta)
+        {
+            return (int) (long) _requestProcessor.Request(
+                "add workers for player",
+                new Dictionary<string, object>
+                {
+                    {"name", prototypeName},
+                    {"delta", delta},
+                })["added"];
         }
 
         #endregion

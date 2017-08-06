@@ -8,31 +8,11 @@ namespace Assets.Code.Common
         public GameObject
             Holder,
             Plain,
-            Forest,
-            House,
+            Building,
             BuildingTimer,
             TableButton, 
             Army,
-            Flag;
-
-
-
-        public GameObject GetPrefab(string serverName)
-        {
-            switch (serverName)
-            {
-                case "Plain":
-                    return Plain;
-
-                case "Forest":
-                    return Forest;
-
-                default:
-                    return House;
-
-                //default:
-                //    throw new NotImplementedException();
-            }
-        }
+            Flag,
+            ManagementRow;
     }
 }

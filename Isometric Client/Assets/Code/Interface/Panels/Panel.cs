@@ -1,7 +1,7 @@
 ﻿using Assets.Code.Common;
 using UnityEngine.UI;
 
-namespace Assets.Code.Interface.Table
+namespace Assets.Code.Interface.Panels
 {
     public class Panel<T> : SingletonBehaviour<T> where T : Panel<T>
     {

@@ -101,6 +101,7 @@
     <Compile Include="Assets\Code\Common\Helpers\TimeSpanHelper.cs" />
     <Compile Include="Assets\Code\Common\Helpers\VectorHelper.cs" />
     <Compile Include="Assets\Code\Common\Keys.cs" />
+    <Compile Include="Assets\Code\Common\Names.cs" />
     <Compile Include="Assets\Code\Common\Prefabs.cs" />
     <Compile Include="Assets\Code\Common\Settings.cs" />
     <Compile Include="Assets\Code\Common\SingletonBehaviour.cs" />
@@ -113,11 +114,14 @@
     <Compile Include="Assets\Code\Interface\Buttons\NextTipButton.cs" />
     <Compile Include="Assets\Code\Interface\Buttons\PreviousTipButton.cs" />
     <Compile Include="Assets\Code\Interface\Buttons\StopTipsButton.cs" />
+    <Compile Include="Assets\Code\Interface\Buttons\WorkersNumberButton.cs" />
     <Compile Include="Assets\Code\Interface\Fixator.cs" />
     <Compile Include="Assets\Code\Interface\GameUi.cs" />
+    <Compile Include="Assets\Code\Interface\ManagementRow.cs" />
     <Compile Include="Assets\Code\Interface\Modes\ArmyUi.cs" />
     <Compile Include="Assets\Code\Interface\Modes\BuildingUi.cs" />
-    <Compile Include="Assets\Code\Interface\Modes\IModeUi.cs" />
+    <Compile Include="Assets\Code\Interface\IModeUi.cs" />
+    <Compile Include="Assets\Code\Interface\Modes\ManagementUi.cs" />
     <Compile Include="Assets\Code\Interface\Modes\ResearchUi.cs" />
     <Compile Include="Assets\Code\Interface\Panels\InformationPanel.cs" />
     <Compile Include="Assets\Code\Interface\Panels\Panel.cs" />

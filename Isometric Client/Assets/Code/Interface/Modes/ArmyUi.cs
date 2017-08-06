@@ -31,7 +31,7 @@ namespace Assets.Code.Interface.Modes
             }
         }
 
-        public void SelectCell(Vector position)
+        public bool SelectCell(Vector position)
         {
             if (position != _lastPosition)
             {
@@ -42,6 +42,8 @@ namespace Assets.Code.Interface.Modes
             _lastArmiesDto = NetManager.Current.GetArmiesInfo(position);
 
             ShowPreviousData();
+
+            return true;
         }
 
         public void HighlightCell(Vector position)
@@ -97,7 +99,7 @@ namespace Assets.Code.Interface.Modes
                     "Выбрать следующую армию");
             }
 
-            if (_lastArmiesDto[_currentArmyIndex].IsControllable)
+            if (_lastArmiesDto[_currentArmyIndex].IsControllable && !_lastArmiesDto[_currentArmyIndex].IsBusy)
             {
                 TableManager.Current.SetButton(
                     4, 0,
@@ -116,11 +118,11 @@ namespace Assets.Code.Interface.Modes
                     Sprites.Current.DestroyBuilding,
                     b =>
                     {
-                        BuildingsManager.Current.SetUpgrade(
-                            _lastPosition, 
-                            "Plain", 
-                            "no owner",
+                        BuildingsManager.Current.SetTimer(
+                            _lastPosition,
                             NetManager.Current.LootBuilding(_lastPosition, _currentArmyIndex));
+
+                        GameUi.Current.Refresh();
                     },
                     "Уничтожить здание");
             }

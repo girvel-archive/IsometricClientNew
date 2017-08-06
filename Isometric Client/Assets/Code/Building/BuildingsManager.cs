@@ -59,14 +59,21 @@ namespace Assets.Code.Building
 
             image.Building 
                 = Instantiate(
-                    Prefabs.Current.GetPrefab(buildingName), 
+                    Prefabs.Current.Building, 
                     GameObjects.Current.BuildingsContainer.transform);
+
+            image.Building.GetComponent<SpriteRenderer>().sprite = Sprites.Current.GetBuilding(buildingName);
             
             image.Building
                 .GetComponent<IsometricController>()
                 .IsometricPosition = position.ToVector2();
 
-            RefreshFlag(buildingName, ownerName, image.Flag);
+            ActionProcessor.Current.AddActionToQueue(() =>
+                RefreshFlag(
+                    buildingName, 
+                    ownerName, 
+                    image.Flag, 
+                    image.Building.GetComponent<SpriteRenderer>().sortingOrder));
 
             if (oldBuilding != null)
             {
@@ -112,8 +119,10 @@ namespace Assets.Code.Building
 
             Debug.Log(image.Name);
 
-            image.Army.GetComponent<SpriteRenderer>().sprite =
-                Sprites.Current.GetArmySpriteForBuilding(image.Name);
+            var spriteRenderer = image.Army.GetComponent<SpriteRenderer>();
+
+            spriteRenderer.sprite = Sprites.Current.GetArmySpriteForBuilding(image.Name);
+            spriteRenderer.sortingOrder = image.Building.GetComponent<SpriteRenderer>().sortingOrder + 1;
         }
 
         public void RemoveArmy(Vector position)
@@ -222,7 +231,7 @@ namespace Assets.Code.Building
             "Forest",
         };
 
-        private void RefreshFlag(string buildingName, string ownerName, SpriteRenderer flag)
+        private void RefreshFlag(string buildingName, string ownerName, SpriteRenderer flag, int buildingSortingOrder)
         {
             Sprite flagSprite = null;
             if (!_buildingsWithoutFlag.Contains(buildingName))
@@ -242,6 +251,7 @@ namespace Assets.Code.Building
             }
             
             flag.sprite = flagSprite;
+            flag.sortingOrder = buildingSortingOrder + 1;
         }
     }
 }
