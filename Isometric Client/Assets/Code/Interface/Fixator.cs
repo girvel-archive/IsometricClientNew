@@ -13,7 +13,8 @@ namespace Assets.Code.Interface
 
         private void Update()
         {
-            GetComponent<RectTransform>().position -= new Vector3(0, GetComponent<RectTransform>().offsetMax.y - _fixedMaxOffsetHeight, 0);
+            GetComponent<RectTransform>().position 
+                -= new Vector3(0, GetComponent<RectTransform>().offsetMax.y - _fixedMaxOffsetHeight, 0);
         }
     }
 }

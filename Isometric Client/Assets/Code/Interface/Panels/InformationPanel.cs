@@ -73,6 +73,8 @@ namespace Assets.Code.Interface.Panels
 
         public void ShowInformation(ArmyDto info)
         {
+            string task;
+
             Text = string.Format(
                 "{0}\n\n"
                 + ArmorTypes[info.ArmorType]
@@ -86,12 +88,12 @@ namespace Assets.Code.Interface.Panels
                         info.BonusDamage,
                         ArmorTypes1[info.BonusArmorType]))
                 + "\nВладелец: '{3}'" 
-                + "\n{4}",
+                + "{4}",
                 Names.RealArmiesNames[info.Name],
                 info.LifePoints,
                 info.Damage,
                 info.Owner,
-                Tasks[info.Task]);
+                Tasks.TryGetValue(info.Task, out task) ? "\n" + task : "");
         }
 
 
@@ -118,7 +120,6 @@ namespace Assets.Code.Interface.Panels
         {
             {"DestroyingTask", "Разрушает здание"},
             {"MovingTask", "Двигается"},
-            {"", ""},
         };  
     }
 }

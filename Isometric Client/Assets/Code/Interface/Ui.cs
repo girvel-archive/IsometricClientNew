@@ -15,7 +15,8 @@ namespace Assets.Code.Interface
             LoginForm, 
             GameUiForm,
             TipForm,
-            ManagementForm; 
+            ManagementForm,
+            ConsoleForm; 
 
         public Text 
             ResourcesText,

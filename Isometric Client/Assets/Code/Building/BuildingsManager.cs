@@ -24,13 +24,91 @@ namespace Assets.Code.Building
 
         public BuildingImage[,] Buildings;
 
+        public int AreaWidth;
 
+
+
+        public void Initialize(int worldWidth, int areaWidth)
+        {
+            Buildings = new BuildingImage[worldWidth, worldWidth];
+            AreaWidth = areaWidth;
+        }
+
+        public void ShowArea(Vector areaPosition, BuildingAreaDto[,] buildings)
+        {
+            foreach (
+                var childTransform
+                in GameObjects.Current.BuildingsContainer.transform
+                    .GetComponentsInChildren<Transform>()
+                    .Where(c => c.gameObject != GameObjects.Current.BuildingsContainer))
+            {
+                Destroy(childTransform.gameObject);
+            }
+
+            for (var x = 0; x < buildings.GetLength(0); x++)
+            for (var y = 0; y < buildings.GetLength(1); y++)
+            {
+                var b = buildings[x, y];
+
+                var buildingAbsolutePosition = areaPosition * AreaWidth + new Vector(x, y);
+
+                Debug.Log("World width: " + Buildings.GetLength(0) + ", Position: " + buildingAbsolutePosition);
+
+                var image 
+                    = this[buildingAbsolutePosition] 
+                    = new BuildingImage
+                {
+                    Holder = Instantiate(
+                        Prefabs.Current.Holder,
+                        new Vector3(0, 0, -1),
+                        new Quaternion(),
+                        GameObjects.Current.BuildingsContainer.transform),
+                    Position = buildingAbsolutePosition,
+                    Name = b.Name,
+                };
+
+                image.Flag = Instantiate(
+                    Prefabs.Current.Flag,
+                    Vector3.zero,
+                    new Quaternion())
+                    .GetComponent<SpriteRenderer>();
+
+                SetBuilding(buildingAbsolutePosition, b.Name, b.OwnerName);
+
+                image.Flag.transform.SetParent(image.Building.transform, false);
+
+                image.Indicator =
+                    Instantiate(
+                        Prefabs.Current.BuildingTimer,
+                        image.Building.transform.position
+                        + new Vector3(0, -0.15f * image.Building.transform.localScale.y, -1),
+                        new Quaternion(),
+                        image.Building.transform)
+                        .GetComponent<Indicator>();
+
+                if (b.BuildingTime > TimeSpan.Zero)
+                {
+                    image.Indicator.Manager = new Timer(b.BuildingTime);
+                }
+
+                image.Indicator.Hunger = b.ArePeopleHungry;
+
+                if (b.IsThereArmy)
+                {
+                    SetArmy(buildingAbsolutePosition);
+                }
+
+                image.Holder
+                    .GetComponent<IsometricController>()
+                    .IsometricPosition = buildingAbsolutePosition.ToVector2();
+            }
+        }
 
         public void SelectBuilding(Vector position)
         {
             ClearBuildingSelection();
 
-            SelectedBuilding = Buildings[position.X, position.Y];
+            SelectedBuilding = this[position];
             
             SelectedBuilding.Holder.GetComponent<SpriteRenderer>().sprite
                 = Sprites.Current.SelectedPlain;
@@ -50,10 +128,10 @@ namespace Assets.Code.Building
         {
             if (Buildings == null)
             {
-                throw new NullReferenceException("Call ShowArea() before SetBuilding()");
+                throw new NullReferenceException("Call Initialize(...) before SetBuilding()");
             }
 
-            var image = Buildings[position.X, position.Y];
+            var image = this[position];
 
             var oldBuilding = image.Building;
 
@@ -92,14 +170,12 @@ namespace Assets.Code.Building
             }
         }
 
-        public void SetUpgrade(Vector position, string buildingName, string ownerName, TimeSpan time)
+        public void SetUpgrade (Vector position, string buildingName, string ownerName, TimeSpan time)
         {
-            var image = Buildings[position.X, position.Y];
-
             SetBuilding(position, buildingName, ownerName);
-
             SetTimer(position, time);
-            image.Name = buildingName;
+
+            this[position].Name = buildingName;
         }
 
         public void SetArmy(Vector position)
@@ -130,73 +206,6 @@ namespace Assets.Code.Building
             Debug.Log(this[position].Army.name);
             Destroy(this[position].Army);
             this[position].Army = null;
-        }
-
-        public void ShowArea(BuildingAreaDto[,] buildings)
-        {
-            foreach (
-                var childTransform 
-                in GameObjects.Current.BuildingsContainer.transform
-                    .GetComponentsInChildren<Transform>()
-                    .Where(c => c.gameObject != GameObjects.Current.BuildingsContainer))
-            {
-                Destroy(childTransform.gameObject);
-            }
-
-            Buildings = new BuildingImage[buildings.GetLength(0), buildings.GetLength(1)];
-
-            for (var x = 0; x < buildings.GetLength(0); x++)
-            {
-                for (var y = 0; y < buildings.GetLength(1); y++)
-                {
-                    var b = buildings[x, y];
-
-                    var image = Buildings[x, y] = new BuildingImage
-                    {
-                        Holder = Instantiate(
-                            Prefabs.Current.Holder,
-                            new Vector3(0, 0, -1),
-                            new Quaternion(),
-                            GameObjects.Current.BuildingsContainer.transform),
-                        Position = new Vector(x, y),
-                        Name = b.Name,
-                    };
-
-                    image.Flag = Instantiate(
-                        Prefabs.Current.Flag,
-                        Vector3.zero,
-                        new Quaternion())
-                        .GetComponent<SpriteRenderer>();
-
-                    SetBuilding(new Vector(x, y), b.Name, b.OwnerName);
-
-                    image.Flag.transform.SetParent(image.Building.transform, false);
-
-                    image.Indicator =
-                        Instantiate(
-                            Prefabs.Current.BuildingTimer,
-                            image.Building.transform.position + new Vector3(0, -0.75f, -1),
-                            new Quaternion(),
-                            image.Building.transform)
-                            .GetComponent<Indicator>();
-
-                    if (b.BuildingTime > TimeSpan.Zero)
-                    {
-                        image.Indicator.Manager = new Timer(b.BuildingTime);
-                    }
-
-                    image.Indicator.Hunger = b.ArePeopleHungry;
-
-                    if (b.IsThereArmy)
-                    {
-                        SetArmy(new Vector(x, y));
-                    }
-                    
-                    image.Holder
-                        .GetComponent<IsometricController>()
-                        .IsometricPosition = new Vector2(x, y);
-                }
-            }
         }
 
         public void SetTimer(Vector position, TimeSpan time)

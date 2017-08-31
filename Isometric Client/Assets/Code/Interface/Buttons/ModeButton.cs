@@ -10,7 +10,7 @@ namespace Assets.Code.Interface.Buttons
 
 
 
-        protected override void OnHotkeyPress()
+        public override void OnHotkeyPress()
         {
             OnClick();
         }

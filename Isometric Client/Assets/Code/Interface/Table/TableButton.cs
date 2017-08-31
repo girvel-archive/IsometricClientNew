@@ -20,7 +20,7 @@ namespace Assets.Code.Interface.Table
         public Text InformationText;
 
 
-        protected override void OnHotkeyPress()
+        public override void OnHotkeyPress()
         {
             OnClick();
         }

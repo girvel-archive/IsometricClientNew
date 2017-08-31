@@ -24,7 +24,6 @@ namespace Assets.Code.Input
             TargetPosition = transform.position;
 
             ThisCamera = GetComponent<Camera>();
-
         }
 
         protected virtual void Update()
@@ -45,7 +44,7 @@ namespace Assets.Code.Input
             }
             else
             {
-                transform.position += path.normalized * CameraMovingSpeed * Time.deltaTime * ThisCamera.orthographicSize;
+                //transform.position += path.normalized * CameraMovingSpeed * Time.deltaTime * ThisCamera.orthographicSize;
             }
         }
 

@@ -25,8 +25,6 @@ namespace Assets.Code.Net
 
         private IPAddress _lastIpAddress;
 
-        private Vector _mainAreaPosition;
-
         public bool Runned { get; private set; }
 
 
@@ -51,7 +49,19 @@ namespace Assets.Code.Net
                 throw new LoginException();
             }
 
-            BuildingsManager.Current.ShowArea(GetArea());
+            var mainAreaPosition = GetMainAreaPosition();
+            Debug.Log(mainAreaPosition);
+            var area = GetArea(mainAreaPosition);
+
+            BuildingsManager.Current.Initialize(GetWorldWidth(), area.GetLength(0));
+
+            BuildingsManager.Current.ShowArea(mainAreaPosition, area);
+
+            Camera.main.transform.position
+                = (Vector3) IsometricController.IsometricPositionToNormal(
+                    mainAreaPosition.ToVector2() * area.GetLength(0),
+                    Vector2.one)
+                  + new Vector3(0, 0, -10);
 
             Runned = true;
 
@@ -108,6 +118,14 @@ namespace Assets.Code.Net
                         }
                     }
                 },
+                {
+                    "building loot starts", news =>
+                    {
+                        BuildingsManager.Current.SetTimer(
+                            (Vector) news.Info["position"], 
+                            (TimeSpan) news.Info["loot time"]);
+                    }
+                }
             });
 
             #endregion
@@ -175,6 +193,23 @@ namespace Assets.Code.Net
 
         #region Requests
 
+        #region Debug and administration
+
+        public bool TryExecute(string command, out string output)
+        {
+            var response = _requestProcessor.Request(
+                "execute command",
+                new Dictionary<string, object>
+                {
+                    {"command", command},
+                });
+
+            output = (string) response["output"];
+            return (bool) response["success"];
+        }
+
+        #endregion
+
         #region Area, login, resources
 
         public bool TryLogin(string login, string password)
@@ -190,17 +225,22 @@ namespace Assets.Code.Net
 
         public Vector GetMainAreaPosition()
         {
-            return (Vector)_requestProcessor.Request("get main area position")["position"];
+            return (Vector) _requestProcessor.Request("get main area position")["position"];
         }
 
-        public BuildingAreaDto[,] GetArea()
+        public int GetWorldWidth()
+        {
+            return (int) (long) _requestProcessor.Request("get world width")["world width"];
+        }
+
+        public BuildingAreaDto[,] GetArea(Vector position)
         {
             return (BuildingAreaDto[,])
                 _requestProcessor.Request(
                     "get area",
                     new Dictionary<string, object>
                     {
-                        {"position", _mainAreaPosition = GetMainAreaPosition()}
+                        {"position", position}
                     })["buildings"];
         }
 
@@ -220,7 +260,7 @@ namespace Assets.Code.Net
                 new Dictionary<string, object>
                 {
                     {"to", upgradeName},
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                 });
 
             time = (TimeSpan) response["upgrade time"];
@@ -233,7 +273,7 @@ namespace Assets.Code.Net
                 "get upgrades",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                 })["upgrades"];
         }
 
@@ -243,7 +283,7 @@ namespace Assets.Code.Net
                 "get building information",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                 })["data"];
         }
 
@@ -257,7 +297,7 @@ namespace Assets.Code.Net
                 "add workers",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                     {"delta", delta}
                 })["success"];
         }
@@ -268,7 +308,7 @@ namespace Assets.Code.Net
                 "add builders",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                     {"delta", delta}
                 })["success"];
         }
@@ -324,6 +364,17 @@ namespace Assets.Code.Net
 
         #region Armies
 
+        public void ClearArmyTasksQueue(Vector position, int armyIndex)
+        {
+            _requestProcessor.Request(
+                "clear army tasks queue",
+                new Dictionary<string, object>
+                {
+                    {"position", position},
+                    {"index", armyIndex},
+                });
+        }
+
         public ArmyDto[] GetArmiesInfo(Vector position)
         {
             return (ArmyDto[])
@@ -331,7 +382,7 @@ namespace Assets.Code.Net
                     "get armies info",
                     new Dictionary<string, object>
                     {
-                        {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                        {"position", position},
                     })["armies"];
         }
 
@@ -341,8 +392,8 @@ namespace Assets.Code.Net
                 "move army",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, from)},
-                    {"to", new AbsolutePosition(_mainAreaPosition, to)},
+                    {"position", from},
+                    {"to", to},
                     {"army index", armyIndex},
                 });
         }
@@ -353,22 +404,24 @@ namespace Assets.Code.Net
                 "train army",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                 });
 
             trainingTime = (TimeSpan) response["training time"];
             return (bool) response["success"];
         }
 
-        public TimeSpan LootBuilding(Vector position, int armyIndex)
+        public void LootBuilding(Vector position, int armyIndex, Vector to, int range)
         {
-            return (TimeSpan) _requestProcessor.Request(
-                "loot building",
+            _requestProcessor.Request(
+                "loot area",
                 new Dictionary<string, object>
                 {
-                    {"position", new AbsolutePosition(_mainAreaPosition, position)},
+                    {"position", position},
                     {"army index", armyIndex},
-                })["loot time"];
+                    {"to", to},
+                    {"range", range},
+                });
         }
 
         #endregion

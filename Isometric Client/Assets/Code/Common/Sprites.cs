@@ -24,7 +24,8 @@ namespace Assets.Code.Common
             DestroyBuilding,
             FlagPlayer,
             FlagNeutral,
-            FlagEnemy;
+            FlagEnemy,
+            Cancel;
 
 
 

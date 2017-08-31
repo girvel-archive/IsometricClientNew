@@ -56,11 +56,7 @@ namespace Assets.Code.Interface.Modes
                         if (NetManager.Current.TryUpgrade(upgrade.Name, _lastPosition, out upgradeTime))
                         {
                             BuildingsManager.Current.SetUpgrade(_lastPosition, upgrade.Name,
-                                NetManager.Current.LastLogin, upgradeTime
-#if DEBUG
-                                    //.Multiple(0.125f)
-#endif
-                                );
+                                NetManager.Current.LastLogin, upgradeTime.Multiple(1 / Settings.Current.GameSpeed));
 
                             ActionProcessor.Current.AddActionToQueue(
                                 () => GameUi.Current.Refresh(),
@@ -99,11 +95,7 @@ namespace Assets.Code.Interface.Modes
                             TimeSpan trainingTime;
                             NetManager.Current.TrainArmy(_lastPosition, out trainingTime);
 
-                            BuildingsManager.Current.SetTimer(_lastPosition, trainingTime
-#if DEBUG
-                                .Multiple(0.125f)
-#endif
-                                );
+                            BuildingsManager.Current.SetTimer(_lastPosition, trainingTime.Multiple(1 / Settings.Current.GameSpeed));
                         },
                         "Тренировать армию");
                 }

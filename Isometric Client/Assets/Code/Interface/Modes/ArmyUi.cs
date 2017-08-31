@@ -99,32 +99,49 @@ namespace Assets.Code.Interface.Modes
                     "Выбрать следующую армию");
             }
 
-            if (_lastArmiesDto[_currentArmyIndex].IsControllable && !_lastArmiesDto[_currentArmyIndex].IsBusy)
+            if (_lastArmiesDto[_currentArmyIndex].IsControllable)
             {
-                TableManager.Current.SetButton(
-                    4, 0,
-                    Sprites.Current.Move,
-                    b =>
-                    {
-                        GameUi.Current.SetSelectingTargetAction(to =>
+                if (_lastArmiesDto[_currentArmyIndex].IsBusy)
+                {
+                    TableManager.Current.SetButton(
+                        2, 0,
+                        Sprites.Current.Cancel,
+                        b =>
                         {
-                            NetManager.Current.MoveArmy(_lastPosition, to, _currentArmyIndex);
-                        });
-                    },
-                    "Переместить армию");
+                            NetManager.Current.ClearArmyTasksQueue(_lastPosition, _currentArmyIndex);
+                            ActionProcessor.Current.AddActionToQueue(() => GameUi.Current.Refresh(), TimeSpan.FromSeconds(1));
+                        },
+                        "Прекратить текущее действие");
+                }
+                else
+                {
+                    TableManager.Current.SetButton(
+                        4, 0,
+                        Sprites.Current.Move,
+                        b =>
+                        {
+                            GameUi.Current.SetSelectingTargetAction(to =>
+                            {
+                                NetManager.Current.ClearArmyTasksQueue(_lastPosition, _currentArmyIndex);
+                                NetManager.Current.MoveArmy(_lastPosition, to, _currentArmyIndex);
+                            });
+                        },
+                        "Переместить армию");
 
-                TableManager.Current.SetButton(
-                    3, 0,
-                    Sprites.Current.DestroyBuilding,
-                    b =>
-                    {
-                        BuildingsManager.Current.SetTimer(
-                            _lastPosition,
-                            NetManager.Current.LootBuilding(_lastPosition, _currentArmyIndex));
-
-                        GameUi.Current.Refresh();
-                    },
-                    "Уничтожить здание");
+                    TableManager.Current.SetButton(
+                        3, 0,
+                        Sprites.Current.DestroyBuilding,
+                        b =>
+                        {
+                            GameUi.Current.SetSelectingTargetAction(to =>
+                            {
+                                NetManager.Current.ClearArmyTasksQueue(_lastPosition, _currentArmyIndex);
+                                NetManager.Current.LootBuilding(_lastPosition, _currentArmyIndex, to, 3);
+                                GameUi.Current.Refresh();
+                            });
+                        },
+                        "Разорить область");
+                }
             }
 
             InformationPanel.Current.ShowInformation(_lastArmiesDto[_currentArmyIndex]);

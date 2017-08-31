@@ -1,5 +1,7 @@
 {
   "settings": {
-    "ShowTips": true
+    "ShowTips": true,
+    "GameSpeed": 100.0
   }
 }}
+}

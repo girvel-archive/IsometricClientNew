@@ -2,7 +2,6 @@
 using Assets.Code.Common;
 using Assets.Code.Common.Helpers;
 using Assets.Code.Interface;
-using Assets.Code.Net;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

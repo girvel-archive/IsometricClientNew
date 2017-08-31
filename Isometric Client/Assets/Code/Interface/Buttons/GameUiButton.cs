@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Code.Input;
 using Assets.Code.Interface.Panels;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,7 +10,7 @@ namespace Assets.Code.Interface.Buttons
 {
     public abstract class GameUiButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        protected abstract void OnHotkeyPress();
+        public abstract void OnHotkeyPress();
 
 
 
@@ -33,13 +34,13 @@ namespace Assets.Code.Interface.Buttons
 
 
 
+        protected virtual void Start()
+        {
+            Keyboard.Current.Buttons.Add(this);
+        }
+
         protected virtual void Update()
         {
-            if (UnityEngine.Input.GetKeyDown(Hotkey))
-            {
-                OnHotkeyPress();
-            }
-
             if (_isMouseOver)
             {
                 InformationPanel.Current.Text = Description;

@@ -10,5 +10,7 @@
         }
 
         public bool ShowTips = true;
+
+        public float GameSpeed = 1;
     }
 }

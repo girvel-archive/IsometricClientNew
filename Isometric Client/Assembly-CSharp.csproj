@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace></RootNamespace>
+    <ProjectGuid>{9468E10A-4247-C98A-9222-62BCCE71DBF8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>Assets</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Temp\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_5_2;UNITY_5_5;UNITY_5;UNITY_64;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_DUCK_TYPING;ENABLE_GENERICS;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;INCLUDE_PUBNUB;ENABLE_PLAYMODE_TESTS_RUNNER;ENABLE_SCRIPTING_NEW_CSHARP_COMPILER;UNITY_STANDALONE_WIN;UNITY_STANDALONE;ENABLE_SUBSTANCE;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_EVENT_QUEUE;ENABLE_CLUSTERINPUT;ENABLE_VIDEO;ENABLE_VR;ENABLE_WEBSOCKET_HOST;ENABLE_MONO;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>E:/soft64/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>E:/soft64/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="Assets\Code\Building\BuildingImage.cs" />
+     <Compile Include="Assets\Code\Building\BuildingsManager.cs" />
+     <Compile Include="Assets\Code\Building\HolderController.cs" />
+     <Compile Include="Assets\Code\Building\IIndicatorManager.cs" />
+     <Compile Include="Assets\Code\Building\Indicator.cs" />
+     <Compile Include="Assets\Code\Building\IsometricController.cs" />
+     <Compile Include="Assets\Code\Building\Timer.cs" />
+     <Compile Include="Assets\Code\Common\ActionProcessor.cs" />
+     <Compile Include="Assets\Code\Common\GameObjects.cs" />
+     <Compile Include="Assets\Code\Common\Helpers\ArrayHelper.cs" />
+     <Compile Include="Assets\Code\Common\Helpers\ResourcesHelper.cs" />
+     <Compile Include="Assets\Code\Common\Helpers\StringHelper.cs" />
+     <Compile Include="Assets\Code\Common\Helpers\TimeSpanHelper.cs" />
+     <Compile Include="Assets\Code\Common\Helpers\VectorHelper.cs" />
+     <Compile Include="Assets\Code\Common\Keys.cs" />
+     <Compile Include="Assets\Code\Common\Names.cs" />
+     <Compile Include="Assets\Code\Common\Prefabs.cs" />
+     <Compile Include="Assets\Code\Common\Settings.cs" />
+     <Compile Include="Assets\Code\Common\SingletonBehaviour.cs" />
+     <Compile Include="Assets\Code\Common\Sprites.cs" />
+     <Compile Include="Assets\Code\Common\TimeSpanHelper.cs" />
+     <Compile Include="Assets\Code\Input\CameraController.cs" />
+     <Compile Include="Assets\Code\Input\Keyboard.cs" />
+     <Compile Include="Assets\Code\Interface\AdministrationConsole.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\GameUiButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\LoginButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\ModeButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\NextTipButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\PreviousTipButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\StopTipsButton.cs" />
+     <Compile Include="Assets\Code\Interface\Buttons\WorkersNumberButton.cs" />
+     <Compile Include="Assets\Code\Interface\Fixator.cs" />
+     <Compile Include="Assets\Code\Interface\GameUi.cs" />
+     <Compile Include="Assets\Code\Interface\IModeUi.cs" />
+     <Compile Include="Assets\Code\Interface\ManagementRow.cs" />
+     <Compile Include="Assets\Code\Interface\Modes\ArmyUi.cs" />
+     <Compile Include="Assets\Code\Interface\Modes\BuildingUi.cs" />
+     <Compile Include="Assets\Code\Interface\Modes\ManagementUi.cs" />
+     <Compile Include="Assets\Code\Interface\Modes\ResearchUi.cs" />
+     <Compile Include="Assets\Code\Interface\Panels\InformationPanel.cs" />
+     <Compile Include="Assets\Code\Interface\Panels\Panel.cs" />
+     <Compile Include="Assets\Code\Interface\Panels\TipPanel.cs" />
+     <Compile Include="Assets\Code\Interface\Table\TableButton.cs" />
+     <Compile Include="Assets\Code\Interface\Table\TableManager.cs" />
+     <Compile Include="Assets\Code\Interface\Ui.cs" />
+     <Compile Include="Assets\Code\Interface\UiMode.cs" />
+     <Compile Include="Assets\Code\Net\Connection.cs" />
+     <Compile Include="Assets\Code\Net\ConnectionToServerException.cs" />
+     <Compile Include="Assets\Code\Net\LoginException.cs" />
+     <Compile Include="Assets\Code\Net\NetManager.cs" />
+     <Compile Include="Assets\Code\Net\NewsProcessor.cs" />
+     <Compile Include="Assets\Code\Net\PermissionDeniedException.cs" />
+     <Compile Include="Assets\Code\Net\RequestProcessor.cs" />
+     <Compile Include="Assets\Code\Net\Serializer.cs" />
+     <Compile Include="Assets\Code\Saving\SavingManager.cs" />
+     <None Include="Assets\Content\tips.txt" />
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.PlaymodeTestsRunner">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/PlaymodeTestsRunner/UnityEngine.PlaymodeTestsRunner.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Networking">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.UI">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.HoloLens">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.VR">
+ <HintPath>E:/soft64/Unity/Editor/Data/UnityExtensions/Unity/UnityVR/RuntimeEditor/UnityEngine.VR.dll</HintPath>
+ </Reference>
+ <Reference Include="BashDotNet">
+ <HintPath>E:/projects/isometric client/Isometric Client/Assets/Dlls/BashDotNet.dll</HintPath>
+ </Reference>
+ <Reference Include="Isometric.Core.Vectors">
+ <HintPath>E:/projects/isometric client/Isometric Client/Assets/Dlls/Isometric.Core.Vectors.dll</HintPath>
+ </Reference>
+ <Reference Include="Isometric.Dtos">
+ <HintPath>E:/projects/isometric client/Isometric Client/Assets/Dlls/Isometric.Dtos.dll</HintPath>
+ </Reference>
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>E:/projects/isometric client/Isometric Client/Assets/Dlls/Newtonsoft.Json.dll</HintPath>
+ </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  
+</Project>
