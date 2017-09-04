@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Assets.Code.Common
 {
-    public class Keys : SingletonBehaviour<Keys>
+    public static class Keys
     {
-        public KeyCode GetKeyFromCoordinates(int x, int y)
+        public static KeyCode GetKeyFromCoordinates(int x, int y)
         {
             switch (y)
             {

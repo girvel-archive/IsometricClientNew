@@ -105,6 +105,10 @@ namespace Assets.Code.Interface.Modes
 
         public void Clear()
         {
+        }
+
+        public void End()
+        {
             Ui.Current.ManagementForm.SetActive(false);
         }
     }

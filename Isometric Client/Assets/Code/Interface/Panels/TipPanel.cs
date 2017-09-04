@@ -35,7 +35,7 @@ namespace Assets.Code.Interface.Panels
         protected override void Start()
         {
             base.Start();
-
+            
             using (var reader = File.OpenText("Assets/Content/tips.txt"))
             {
                 Tips = reader
@@ -45,7 +45,7 @@ namespace Assets.Code.Interface.Panels
 
             if (Settings.Current.ShowTips)
             {
-                ActionProcessor.Current.AddActionToQueue(() => CurrentTipIndex = 0);
+                CurrentTipIndex = 0;    
             }
             else
             {

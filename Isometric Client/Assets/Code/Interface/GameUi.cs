@@ -115,7 +115,7 @@ namespace Assets.Code.Interface
         
         public void SetMode(UiMode mode)
         {
-            Clear();
+            End();
             Mode = mode;
             Refresh();
         }
@@ -171,6 +171,11 @@ namespace Assets.Code.Interface
             TableManager.Current.Clear();
 
             ModeUis[Mode].Clear();
+        }
+
+        public void End()
+        {
+            ModeUis[Mode].End();
         }
     }
 }

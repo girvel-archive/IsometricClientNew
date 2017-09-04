@@ -151,5 +151,10 @@ namespace Assets.Code.Interface.Modes
         {
             
         }
+
+        public void End()
+        {
+            
+        }
     }
 }

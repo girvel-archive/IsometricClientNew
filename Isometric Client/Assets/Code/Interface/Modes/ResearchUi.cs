@@ -61,6 +61,10 @@ namespace Assets.Code.Interface.Modes
             ShowResearches();
         }
 
+        public void End()
+        {
+            Clear();
+        }
 
 
         private void ShowResearches()

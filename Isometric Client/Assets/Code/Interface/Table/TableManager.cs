@@ -47,8 +47,7 @@ namespace Assets.Code.Interface.Table
             b.Click = action;
             b.Description = description;
 
-            ActionProcessor.Current.AddActionToQueue(
-                () => b.Hotkey = Keys.Current.GetKeyFromCoordinates(x, y));
+            b.Hotkey = Keys.GetKeyFromCoordinates(x, y);
         }
 
         public void Clear()

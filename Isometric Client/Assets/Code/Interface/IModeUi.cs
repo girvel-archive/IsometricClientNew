@@ -38,5 +38,10 @@ namespace Assets.Code.Interface
         /// clears Ui
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// clears Ui before mode is switched
+        /// </summary>
+        void End();
     }
 }

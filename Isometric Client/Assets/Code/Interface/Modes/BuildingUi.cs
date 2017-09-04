@@ -145,6 +145,11 @@ namespace Assets.Code.Interface.Modes
             
         }
 
+        public void End()
+        {
+            
+        }
+
         private TimeSpan _currentRequestDelay = TimeSpan.FromSeconds(1);
     }
 }

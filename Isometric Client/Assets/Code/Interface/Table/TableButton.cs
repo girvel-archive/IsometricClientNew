@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Assets.Code.Interface.Table
 {
-    public class TableButton : GameUiButton, IPointerEnterHandler, IPointerExitHandler
+    public class TableButton : GameUiButton
     {
         public Action<TableButton> Click = b => { };
 
