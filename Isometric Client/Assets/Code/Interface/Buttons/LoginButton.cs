@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using Assets.Code.Common;
 using Assets.Code.Net;
@@ -35,6 +36,16 @@ namespace Assets.Code.Interface.Buttons
                     {
                         Ui.Current.LoginStatusText.text = "Wrong login or password";
                     }
+                    catch (InvalidOperationException)
+                    {
+                        Ui.Current.LoginStatusText.text = "Can not get host address";
+                    }
+#if !DEBUG
+                    catch (Exception)
+                    {
+                        Ui.Current.LoginStatusText.text = "Something went wrong";
+                    }
+#endif
                 });
 
         }
